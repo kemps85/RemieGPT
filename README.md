@@ -1,155 +1,175 @@
 # RemieGPT
 
-Remi is a custom Codex Pet based on Remielle. She reacts when Codex is working,
-waiting for input, ready for review, or blocked by an error.
+[Hướng dẫn tiếng Việt, viết cho người mới](README.vi.md)
 
-[Đọc hướng dẫn tiếng Việt](README.vi.md)
+RemieGPT is a standalone Windows desktop companion built from the original Remi
+GIFs stored in this repository. It stays visible while you move between Chrome,
+Word, Codex, and other applications, and reacts to typing plus supported AI
+thinking, writing, waiting, and completion states.
 
-The published spritesheet is built only from the six source GIFs in this
-repository. No generated or redrawn character frames are used.
+![Remi writing](assets/source/writing.gif)
 
-![Remi working in Codex](qa/previews/running.gif)
+No character image is generated, redrawn, or downloaded at runtime. RemieGPT
+plays the complete repository GIFs directly and does not depend on Codex Pet.
 
-## Requirements
+## Easiest installation
 
-- ChatGPT desktop app with **Pets** available, or a compatible Codex CLI
-- Windows, macOS, or Linux
-- No API key and no build tools are required
+1. Open the [latest GitHub Release](https://github.com/kemps85/RemieGPT/releases/latest).
+2. Download `RemieGPT-Setup-...-x64.exe`.
+3. Double-click it and choose **Next → Install → Finish**.
+4. Open RemieGPT later from its Desktop or Start Menu shortcut.
 
-## Install on Windows
+Use `RemieGPT-Portable-...-x64.exe` if you only want to try it without installing.
+If the Releases page has no EXE yet, no public build has been published; build
+from source using the beginner instructions below.
 
-Clone or download this repository, open PowerShell in the repository folder,
-then run:
+Windows may show a SmartScreen warning because community builds are not code
+signed. Do not bypass the warning blindly. Download only from this repository,
+scan the file, compare its SHA256 checksum, or inspect and build the source
+yourself.
+
+## Controls
+
+- Hold the left mouse button on Remi and drag her anywhere, including another
+  monitor.
+- Right-click the Remi tray icon near the clock to resize, reset her position,
+  hide, or quit.
+- **Click through Remi** lets clicks reach the app underneath. Choose **Allow
+  dragging Remi** to move her again. Click-through resets on restart so Remi
+  cannot remain permanently unreachable.
+- Enable **Start with Windows** from the tray menu if wanted.
+
+## AI setup
+
+Codex desktop, Codex CLI, and Claude Code work without a browser extension.
+
+For ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, and Grok websites:
+
+1. Right-click the Remi tray icon and choose **Open web AI helper**.
+2. Open `chrome://extensions` or `edge://extensions`.
+3. Enable **Developer mode**.
+4. Choose **Load unpacked** and select the folder RemieGPT opened.
+5. Refresh any AI tabs that were already open.
+
+ChatGPT, Claude, and Gemini have additional site-specific thinking signals.
+Other supported sites use a conservative shared streaming detector.
+
+## Animation meanings
+
+| Situation | GIF |
+| --- | --- |
+| Nothing is happening | `idle.gif` |
+| You type in any Windows app | `writing.gif` |
+| Supported AI is thinking | `thinking.gif` |
+| AI is displaying an answer | `writing.gif` |
+| AI explicitly needs an answer or approval | `waiting-input.gif` |
+| AI has just finished | `result.gif` |
+
+`waiting-input.gif` is not the default idle animation. It is reserved for an
+actual question or approval request from the AI.
+
+## Privacy and security model
+
+- Global input monitoring receives only the fact that input happened. It does
+  not store key codes, typed text, passwords, clipboard data, or mouse positions.
+- Local Codex and Claude event files are inspected for event types needed to
+  choose an animation. Conversations are not uploaded.
+- A small active-window thumbnail may be compared in memory while a local AI
+  task is active. The thumbnail is discarded and never saved.
+- The browser helper reports only `thinking`, `writing`, or `finished` to
+  `127.0.0.1` on the same computer. Prompts and answers are not sent.
+- RemieGPT has no advertising, telemetry, or separate account system.
+
+## Inspect the source and build your own EXE
+
+This path is intended for people who do not want to trust a prebuilt binary.
+Git is not required.
+
+1. Install [Node.js](https://nodejs.org/) 22.12 or newer for Windows x64.
+2. Download **Source code (zip)** from the same GitHub Release.
+3. Extract it somewhere ordinary, such as `Documents\RemieGPT`.
+4. Double-click `build-windows.cmd`.
+5. The script installs the exact locked dependencies, runs tests, audits runtime
+   packages, builds both EXEs, packages the browser helper, and writes SHA256
+   checksums.
+6. When it finishes, use a file from the opened `dist` folder:
+
+```text
+dist\RemieGPT-Setup-<version>-x64.exe
+dist\RemieGPT-Portable-<version>-x64.exe
+```
+
+The first build requires Internet access so npm can download Electron and the
+packages listed in `package-lock.json`.
+
+### Source-review map
+
+| Path | What it does |
+| --- | --- |
+| `package.json` | Dependencies and packaging commands |
+| `package-lock.json` | Exact dependency versions and integrity hashes |
+| `desktop/main.js` | Window, tray menu, and detector startup |
+| `desktop/global-input.js` | Input-activity events without key content |
+| `desktop/ai-monitor.js` | Local Codex and Claude event classification |
+| `desktop/visual-writing-monitor.js` | In-memory active-window change comparison |
+| `desktop/web-ai-server.js` | Localhost-only browser-helper receiver |
+| `browser-extension/` | Complete browser helper source |
+| `.github/workflows/` | CI build and release commands |
+
+There is no hidden executable inside the source tree. The runtime code is
+readable JavaScript and PowerShell.
+
+### Manual build commands
+
+```bat
+npm ci
+npm test
+npm audit --omit=dev
+npm run build:win
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\package-release.ps1
+```
+
+### Verify a downloaded release
+
+Download `SHA256SUMS.txt` beside the EXE, then run in PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
+Get-FileHash .\RemieGPT-Setup-0.2.0-x64.exe -Algorithm SHA256
 ```
 
-The script copies Remi to:
+The displayed hash must match the corresponding line in `SHA256SUMS.txt`.
+A matching checksum proves that the download matches the repository release;
+it does not by itself prove that any program is harmless. A locally built EXE
+may have a different hash because package timestamps and metadata can differ.
 
-```text
-%USERPROFILE%\.codex\pets\remi
+## Clone and build with Git
+
+```bat
+git clone https://github.com/kemps85/RemieGPT.git
+cd RemieGPT
+build-windows.cmd
 ```
 
-If `CODEX_HOME` is set, the script uses that folder instead.
+## Windows limitations
 
-## Install on macOS or Linux
+- Remi stays above ordinary and maximized windows.
+- Windows lock/UAC secure screens and some exclusive full-screen games can
+  cover desktop overlays.
+- Typing works across applications, but AI thinking/writing detection is exact
+  only for supported providers.
+- Releases target Windows x64 because that is the platform tested in practice.
 
-Clone or download this repository, open a terminal in the repository folder,
-then run:
+## Artwork, references, and licenses
 
-```bash
-sh ./scripts/install.sh
-```
+RemieGPT uses only GIFs under `assets/source`. The app icon is a frame extracted
+from `idle.gif`; no AI-generated artwork is used.
 
-The script copies Remi to:
+Website signal ideas were informed by
+[Gemielle](https://github.com/Rainan1010/Gemielle) and
+[Remielle-Widget](https://github.com/qantrung-art/Remielle-Widget). See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). No artwork was copied from
+those repositories.
 
-```text
-~/.codex/pets/remi
-```
-
-If `CODEX_HOME` is set, the script uses that folder instead.
-
-## Install manually
-
-Copy the complete [`pet/remi`](pet/remi) folder to:
-
-```text
-<CODEX_HOME>/pets/remi
-```
-
-When `CODEX_HOME` is not set, use:
-
-- Windows: `%USERPROFILE%\.codex\pets\remi`
-- macOS/Linux: `~/.codex/pets/remi`
-
-The installed folder must contain both files:
-
-```text
-remi/
-├── pet.json
-└── spritesheet.webp
-```
-
-## Use Remi
-
-1. Open the Codex desktop app.
-2. Go to **Settings > Pets**.
-3. Select **Refresh**.
-4. Choose **Remi**.
-5. Enter `/pet`, or open the command menu and select **Wake Pet**.
-
-Enter `/pet` again to tuck Remi away.
-
-In an interactive Codex CLI session, enter `/pets` or `/pet` to open the pet
-picker. Terminal pets require a terminal with supported graphics.
-
-## Animation states
-
-| Codex state | Remi animation |
-| --- | --- |
-| Idle | Calm breathing and blinking |
-| Running | Actively works on the tablet |
-| Needs input | Waits for approval or an answer |
-| Ready | Reviews the finished result |
-| Blocked | Reacts to an error |
-| Drag left/right | Moves with the floating pet |
-
-The supplied GIF set does not contain dedicated drag-facing, wave, jump, or
-pointer-look artwork. Those rows reuse the closest original loops instead of
-inventing new frames.
-
-## Package format
-
-- Codex Pet sprite contract: 9-row custom pet
-- Cell size: `192 x 208`
-- Atlas grid: `8 x 9`
-- Final spritesheet: `1536 x 1872`
-- Image format: transparent WebP
-
-## Troubleshooting
-
-### Remi does not appear in the pet picker
-
-- Confirm both package files are in the same `remi` folder.
-- In **Settings > Pets**, select **Refresh**.
-- Restart the Codex desktop app if the picker was already open during install.
-- Confirm you installed to the active `CODEX_HOME`.
-
-### The pet is visible but does not animate
-
-Pets respect the operating system's reduced-motion setting. With reduced
-motion enabled, Codex uses a still frame.
-
-### The Codex IDE extension does not show Remi
-
-The IDE extension does not provide the floating pet overlay. Use the ChatGPT
-desktop app or a compatible Codex CLI terminal.
-
-## Development and QA
-
-The release atlas is assembled and checked against the 9-row custom-pet
-contract. QA artifacts are published under [`qa`](qa) so contributors can
-inspect the source mapping and animation rows without rebuilding the pet.
-
-To rebuild the pet only from the source GIFs:
-
-```bash
-python scripts/build_pet.py
-```
-
-To run the repository-level package check:
-
-```bash
-python -m pip install -r requirements-dev.txt
-python scripts/validate_package.py
-```
-
-GitHub Actions runs the same check on every push and pull request.
-
-## License
-
-Installer scripts and documentation are available under
-[`LICENSE-CODE`](LICENSE-CODE). Character artwork and the compiled spritesheet
-are excluded from that license unless their rights holder grants separate
-permission.
+Code and documentation follow [LICENSE-CODE](LICENSE-CODE). Character artwork
+is not automatically granted under the code license unless its rights holder
+provides separate permission.

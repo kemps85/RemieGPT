@@ -1,4 +1,6 @@
 /work/
+/node_modules/
+/dist/
 /*.gif
 *.tmp
 *.log

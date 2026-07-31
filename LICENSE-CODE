@@ -3,7 +3,8 @@ MIT License
 Copyright (c) 2026 kemps85
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of the installer scripts and documentation in this repository (the
+of the application source code, installer scripts, build workflows, and
+documentation in this repository (the
 "Software"), to deal in the Software without restriction, including without
 limitation the rights to use, copy, modify, merge, publish, distribute,
 sublicense, and/or sell copies of the Software, and to permit persons to whom
@@ -20,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This license applies to the installer scripts and documentation only.
-Character artwork and the compiled spritesheet are not covered unless their
-rights holder grants separate permission.
+This license applies to the application source code, installer scripts, build
+workflows, and documentation only. Character artwork, source GIF files, and
+compiled artwork assets are not covered unless their rights holder grants
+separate permission.
