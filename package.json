@@ -7,7 +7,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test desktop/**/*.test.js",
-    "build:win": "electron-builder --win nsis portable",
+    "build:win": "electron-builder --win nsis portable --publish never",
     "pack:win": "electron-builder --win dir"
   },
   "author": "kemps85",
