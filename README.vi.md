@@ -2,8 +2,8 @@
 
 [English README](README.md)
 
-RemieGPT là Remi nổi riêng trên màn hình Windows. Remi vẫn ở đó khi m chuyển
-giữa Chrome, Word, Codex hoặc ứng dụng khác, và đổi GIF theo lúc m gõ, lúc AI
+RemieGPT là Remi nổi riêng trên màn hình Windows. Remi vẫn ở đó khi bạn chuyển
+giữa Chrome, Word, Codex hoặc ứng dụng khác, và đổi GIF theo lúc bạn gõ, lúc AI
 suy nghĩ, lúc AI trả lời và lúc AI hoàn thành.
 
 ![Remi đang viết](assets/source/writing.gif)
@@ -23,7 +23,7 @@ Nếu chỉ muốn thử mà không cài, tải `RemieGPT-Portable-...-x64.exe` 
 tiếp. Bản Portable không tự tạo shortcut.
 
 Nếu trang Releases chưa có file EXE thì bản đó chưa được phát hành công khai.
-M có thể chờ bản phát hành hoặc tự build bằng hướng dẫn bên dưới.
+Bạn có thể chờ bản phát hành hoặc tự build bằng hướng dẫn bên dưới.
 
 ### Windows hiện “Windows protected your PC” thì sao?
 
@@ -85,10 +85,10 @@ các trang còn lại dùng cách nhận biết chung.
 | Trường hợp | GIF dùng |
 | --- | --- |
 | Không có hoạt động | `idle.gif` |
-| M gõ trong bất kỳ ứng dụng Windows nào | `writing.gif` |
+| Bạn gõ trong bất kỳ ứng dụng Windows nào | `writing.gif` |
 | AI được hỗ trợ đang suy nghĩ | `thinking.gif` |
 | AI đang hiện câu trả lời | `writing.gif` |
-| AI thật sự cần m trả lời hoặc xác nhận | `waiting-input.gif` |
+| AI thật sự cần bạn trả lời hoặc xác nhận | `waiting-input.gif` |
 | AI vừa hoàn thành | `result.gif` |
 
 `waiting-input.gif` không phải trạng thái đứng yên. Nó chỉ xuất hiện khi AI
@@ -97,7 +97,7 @@ thực sự hỏi lại hoặc yêu cầu xác nhận.
 ## Quyền riêng tư: app nhìn thấy gì?
 
 - Bộ nhận bàn phím chỉ biết **vừa có một phím được bấm**. Code không lấy ký tự,
-  không lưu nội dung m gõ và không đọc clipboard.
+  không lưu nội dung bạn gõ và không đọc clipboard.
 - Với Codex/Claude, app đọc loại sự kiện mới được ghi vào file tiến trình cục
   bộ để phân biệt thinking, writing, waiting và complete. App không gửi cuộc
   trò chuyện đi đâu.
@@ -170,7 +170,7 @@ Get-FileHash .\RemieGPT-Setup-0.2.0-x64.exe -Algorithm SHA256
 ```
 
 Chuỗi `Hash` phải giống dòng cùng tên trong `SHA256SUMS.txt`. SHA256 chỉ xác
-nhận file m tải giống file được repo phát hành; nó không tự chứng minh chương
+nhận file bạn tải giống file được repo phát hành; nó không tự chứng minh chương
 trình hoàn toàn an toàn. Build lại từ mã nguồn là cách kiểm tra độc lập hơn.
 
 File tự build có thể không có SHA256 giống hệt file Release vì thời gian đóng
