@@ -34,3 +34,10 @@ test("browser helper only connects to RemieGPT on localhost", () => {
   assert.ok(worker.includes("ws://127.0.0.1:47582"));
   assert.ok(!/wss?:\/\/(?!127\.0\.0\.1)/.test(worker));
 });
+
+test("browser helper only forwards the focused window's active tab", () => {
+  assert.match(worker, /chrome\.tabs\.onActivated/);
+  assert.match(worker, /chrome\.windows\.onFocusChanged/);
+  assert.match(worker, /focusedWindowId/);
+  assert.match(worker, /selectedSource/);
+});

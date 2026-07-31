@@ -3,6 +3,8 @@ const states = new Map();
 
 let socket;
 let reconnectTimer;
+let focusedWindowId = chrome.windows.WINDOW_ID_NONE;
+let selectedSource = null;
 
 function send(source, state) {
   if (socket?.readyState !== WebSocket.OPEN) return;
@@ -11,9 +13,27 @@ function send(source, state) {
       type: "ai-state",
       source,
       active: state.active,
-      mode: state.mode
+      mode: state.mode,
+      reason: state.reason
     })
   );
+}
+
+function sourceFor(tab) {
+  return `${tab.windowId}:${tab.id}`;
+}
+
+async function selectActiveTab(windowId) {
+  focusedWindowId = windowId;
+  if (windowId === chrome.windows.WINDOW_ID_NONE) return;
+
+  const [tab] = await chrome.tabs.query({ active: true, windowId });
+  if (!tab) return;
+
+  const source = sourceFor(tab);
+  selectedSource = source;
+  const state = states.get(source);
+  if (state?.active) send(source, state);
 }
 
 function connect() {
@@ -21,7 +41,9 @@ function connect() {
   socket = new WebSocket(SERVER);
 
   socket.addEventListener("open", () => {
-    for (const [source, state] of states) send(source, state);
+    if (selectedSource && states.get(selectedSource)?.active) {
+      send(selectedSource, states.get(selectedSource));
+    }
   });
 
   socket.addEventListener("close", () => {
@@ -42,23 +64,28 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     return;
   }
 
-  const host = String(message.host || "ai-web").replace(
-    /[^a-zA-Z0-9._-]/g,
-    "_"
-  );
-  const source = `${host}:${sender.tab.id}`;
+  const source = sourceFor(sender.tab);
   const state = {
     active: message.active,
-    mode: message.mode === "thinking" ? "thinking" : "writing"
+    mode: message.mode === "thinking" ? "thinking" : "writing",
+    reason: message.active ? null : "finished"
   };
   states.set(source, state);
-  send(source, state);
+
+  if (sender.tab.windowId === focusedWindowId && sender.tab.active) {
+    if (selectedSource && selectedSource !== source) {
+      send(selectedSource, { active: false, mode: null, reason: "background" });
+    }
+    selectedSource = source;
+    send(source, state);
+  }
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   for (const source of states.keys()) {
     if (source.endsWith(`:${tabId}`)) {
-      send(source, { active: false, mode: null });
+      send(source, { active: false, mode: null, reason: "background" });
+      if (selectedSource === source) selectedSource = null;
       states.delete(source);
     }
   }
@@ -68,10 +95,36 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (!changeInfo.url) return;
   for (const source of states.keys()) {
     if (source.endsWith(`:${tabId}`)) {
-      send(source, { active: false, mode: null });
+      send(source, { active: false, mode: null, reason: "background" });
+      if (selectedSource === source) selectedSource = null;
       states.delete(source);
     }
   }
 });
+
+chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+  if (windowId !== focusedWindowId) return;
+  const nextSource = `${windowId}:${tabId}`;
+  if (nextSource === selectedSource) return;
+  if (selectedSource) {
+    send(selectedSource, { active: false, mode: null, reason: "background" });
+  }
+  selectedSource = nextSource;
+  const state = states.get(nextSource);
+  if (state?.active) send(nextSource, state);
+});
+
+chrome.windows.onFocusChanged.addListener((windowId) => {
+  if (selectedSource) {
+    send(selectedSource, { active: false, mode: null, reason: "background" });
+  }
+  selectedSource = null;
+  selectActiveTab(windowId).catch(() => {});
+});
+
+chrome.windows
+  .getLastFocused({ populate: true })
+  .then((window) => selectActiveTab(window.id))
+  .catch(() => {});
 
 connect();

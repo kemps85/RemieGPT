@@ -5,7 +5,6 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   app,
   BrowserWindow,
-  desktopCapturer,
   ipcMain,
   Menu,
   nativeImage,
@@ -17,15 +16,19 @@ import {
 
 import { ActivityState, PET_STATES } from "./activity-state.js";
 import { AiMonitor } from "./ai-monitor.js";
+import { ForegroundAiGate } from "./foreground-ai-gate.js";
 import { ForegroundMonitor } from "./foreground-monitor.js";
 import { GlobalInput } from "./global-input.js";
-import { VisualWritingMonitor } from "./visual-writing-monitor.js";
 import { WebAiServer } from "./web-ai-server.js";
-import { WindowDragController } from "./window-drag-controller.js";
+import {
+  defaultPosition as positionInWorkArea,
+  safeWindowPosition
+} from "./window-bounds.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SETTINGS_FILE = "settings.json";
-const DEFAULT_SIZE = 220;
+const PET_SIZE = 220;
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
 
 let mainWindow;
 let tray;
@@ -34,14 +37,13 @@ let globalInput;
 let aiMonitor;
 let webAiServer;
 let foregroundMonitor;
-let visualWritingMonitor;
-let windowDragController;
+let foregroundAiGate;
 let idleTimer;
 let currentState = "idle";
 let saveBoundsTimer;
+let enforceSizeTimer;
 let settings = {
   settingsVersion: 4,
-  size: DEFAULT_SIZE,
   startWithWindows: false,
   clickThrough: false
 };
@@ -64,6 +66,13 @@ function loadSettings() {
   } catch {
     // First launch uses defaults.
   }
+  // Remi deliberately has a fixed size. Ignore stale settings from older
+  // releases that offered size controls.
+  delete settings.size;
+  if (!Number.isInteger(settings.x) || !Number.isInteger(settings.y)) {
+    delete settings.x;
+    delete settings.y;
+  }
 }
 
 function saveSettings() {
@@ -72,11 +81,45 @@ function saveSettings() {
 }
 
 function defaultPosition(size) {
-  const area = screen.getPrimaryDisplay().workArea;
-  return {
-    x: area.x + area.width - size - 18,
-    y: area.y + area.height - size - 18
-  };
+  return positionInWorkArea(size, screen.getPrimaryDisplay().workArea);
+}
+
+function safePosition(position, size = PET_SIZE) {
+  return safeWindowPosition({
+    position,
+    size,
+    workAreas: screen.getAllDisplays().map((display) => display.workArea),
+    primaryWorkArea: screen.getPrimaryDisplay().workArea
+  });
+}
+
+function keepWindowVisible() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const [x, y] = mainWindow.getPosition();
+  const position = safePosition({ x, y });
+  if (position.x === x && position.y === y) return;
+  mainWindow.setPosition(position.x, position.y, true);
+  settings.x = position.x;
+  settings.y = position.y;
+  saveSettings();
+}
+
+function startupExecutablePath() {
+  const portablePath = process.env.PORTABLE_EXECUTABLE_FILE;
+  return portablePath && fs.existsSync(portablePath) ? portablePath : process.execPath;
+}
+
+function applyAutoStart(enabled) {
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: enabled,
+      path: startupExecutablePath()
+    });
+    return true;
+  } catch (error) {
+    console.warn("auto-start", error?.message ?? "could not update setting");
+    return false;
+  }
 }
 
 function assetUrl(filename) {
@@ -101,11 +144,12 @@ function sendState(name) {
   }
 }
 
-function setWindowSize(nextSize) {
-  const size = Math.max(150, Math.min(360, nextSize));
-  settings.size = size;
-  mainWindow.setSize(size, size, true);
-  saveSettings();
+function enforceWindowSize() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const [width, height] = mainWindow.getSize();
+  if (width === PET_SIZE && height === PET_SIZE) return;
+  mainWindow.setSize(PET_SIZE, PET_SIZE, false);
+  keepWindowVisible();
 }
 
 function applyClickThrough() {
@@ -116,15 +160,6 @@ function applyClickThrough() {
 
 function buildMenu() {
   return Menu.buildFromTemplate([
-    {
-      label: "Remi lớn hơn",
-      click: () => setWindowSize(settings.size + 20)
-    },
-    {
-      label: "Remi nhỏ hơn",
-      click: () => setWindowSize(settings.size - 20)
-    },
-    { type: "separator" },
     {
       label: "Cho chuột xuyên qua Remi",
       type: "checkbox",
@@ -151,18 +186,16 @@ function buildMenu() {
       type: "checkbox",
       checked: settings.startWithWindows,
       click: (item) => {
-        settings.startWithWindows = item.checked;
-        app.setLoginItemSettings({
-          openAtLogin: item.checked,
-          path: process.execPath
-        });
+        settings.startWithWindows = item.checked && applyAutoStart(true);
+        if (!item.checked) applyAutoStart(false);
         saveSettings();
+        tray?.setContextMenu(buildMenu());
       }
     },
     {
       label: "Đưa Remi về góc phải",
       click: () => {
-        const { x, y } = defaultPosition(settings.size);
+        const { x, y } = defaultPosition(PET_SIZE);
         mainWindow.setPosition(x, y, true);
       }
     },
@@ -190,12 +223,12 @@ function buildMenu() {
 function createWindow() {
   const position =
     Number.isInteger(settings.x) && Number.isInteger(settings.y)
-      ? { x: settings.x, y: settings.y }
-      : defaultPosition(settings.size);
+      ? safePosition({ x: settings.x, y: settings.y })
+      : defaultPosition(PET_SIZE);
 
   mainWindow = new BrowserWindow({
-    width: settings.size,
-    height: settings.size,
+    width: PET_SIZE,
+    height: PET_SIZE,
     x: position.x,
     y: position.y,
     transparent: true,
@@ -216,11 +249,6 @@ function createWindow() {
     }
   });
 
-  windowDragController = new WindowDragController({
-    getWindow: () => mainWindow,
-    getCursor: () => screen.getCursorScreenPoint()
-  });
-
   const keepAboveWindows = () => {
     if (!mainWindow || mainWindow.isDestroyed() || !mainWindow.isVisible()) {
       return;
@@ -230,8 +258,14 @@ function createWindow() {
   };
 
   mainWindow.setFullScreenable(false);
+  mainWindow.setResizable(false);
+  mainWindow.setMinimumSize(PET_SIZE, PET_SIZE);
+  mainWindow.setMaximumSize(PET_SIZE, PET_SIZE);
   mainWindow.setAlwaysOnTop(true, "screen-saver", 1);
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  // A pinch or Ctrl + wheel must never turn a drag into a browser zoom.
+  mainWindow.webContents.setZoomFactor(1);
+  mainWindow.webContents.setVisualZoomLevelLimits(1, 1).catch(() => {});
   mainWindow.loadFile(path.join(here, "renderer", "index.html"));
   mainWindow.once("ready-to-show", () => {
     mainWindow.showInactive();
@@ -251,6 +285,11 @@ function createWindow() {
       settings.y = y;
       saveSettings();
     }, 250);
+  });
+
+  mainWindow.on("resize", () => {
+    clearTimeout(enforceSizeTimer);
+    enforceSizeTimer = setTimeout(enforceWindowSize, 0);
   });
 
   mainWindow.on("close", (event) => {
@@ -287,30 +326,27 @@ function createTray() {
 
 function startActivityTracking() {
   activity = new ActivityState({ emit: sendState });
+  foregroundAiGate = new ForegroundAiGate(activity);
   globalInput = new GlobalInput(activity, {
-    onMouseUp: () => windowDragController?.stop()
+    onKeyboard: () => foregroundAiGate.noteUserInput(),
+    onPointer: () => foregroundAiGate.notePointerAction()
   });
   globalInput.start();
   aiMonitor = new AiMonitor((source, mode) => {
-    activity.setAiMode(source, mode);
+    foregroundAiGate.setAiMode(source, mode);
   });
   aiMonitor.start();
-  webAiServer = new WebAiServer((source, mode) => {
-    activity.setAiMode(source, mode);
+  webAiServer = new WebAiServer((source, mode, options) => {
+    activity.setAiMode(source, mode, options);
   });
   webAiServer.start();
-  visualWritingMonitor = new VisualWritingMonitor({
-    desktopCapturer,
-    activity
-  });
   const foregroundHelper = app.isPackaged
     ? path.join(process.resourcesPath, "helpers", "foreground-window.ps1")
     : path.join(app.getAppPath(), "desktop", "helpers", "foreground-window.ps1");
   foregroundMonitor = new ForegroundMonitor({
     helperPath: foregroundHelper,
-    onChange: (info) => visualWritingMonitor.setForeground(info)
+    onChange: (info) => foregroundAiGate.setForeground(info)
   });
-  visualWritingMonitor.start();
   foregroundMonitor.start();
 
   idleTimer = setInterval(() => {
@@ -322,11 +358,28 @@ function startActivityTracking() {
   powerMonitor.on("resume", () => activity.noteUnlock());
 }
 
-app.whenReady().then(() => {
+if (!hasSingleInstanceLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    mainWindow.showInactive();
+    mainWindow.moveTop();
+  });
+
+  app.whenReady().then(() => {
   loadSettings();
   createWindow();
   createTray();
+  if (settings.startWithWindows && !applyAutoStart(true)) {
+    settings.startWithWindows = false;
+    saveSettings();
+  }
   startActivityTracking();
+
+  screen.on("display-added", keepWindowVisible);
+  screen.on("display-removed", keepWindowVisible);
+  screen.on("display-metrics-changed", keepWindowVisible);
 
   ipcMain.on("show-menu", () => {
     buildMenu().popup({ window: mainWindow });
@@ -334,29 +387,20 @@ app.whenReady().then(() => {
   ipcMain.on("pet-hover", (_event, hovering) => {
     activity.setHovering(Boolean(hovering));
   });
-  ipcMain.on("drag-start", (_event, point) => {
-    if (settings.clickThrough) return;
-    const x = Number(point?.x);
-    const y = Number(point?.y);
-    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-    windowDragController?.start({ x, y });
-  });
-  ipcMain.on("drag-move", () => windowDragController?.update());
-  ipcMain.on("drag-end", () => windowDragController?.stop());
-
   app.on("activate", () => {
     mainWindow.showInactive();
   });
-});
+  });
+}
 
 app.on("before-quit", async () => {
   app.isQuitting = true;
   clearInterval(idleTimer);
   clearTimeout(saveBoundsTimer);
+  clearTimeout(enforceSizeTimer);
   globalInput?.stop();
   foregroundMonitor?.stop();
-  visualWritingMonitor?.stop();
-  windowDragController?.stop();
+  foregroundAiGate?.clear();
   await aiMonitor?.stop();
   await webAiServer?.stop();
   activity?.dispose();

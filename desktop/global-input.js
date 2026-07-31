@@ -1,14 +1,22 @@
 import { uIOhook } from "uiohook-napi";
 
 export class GlobalInput {
-  constructor(activity, { onMouseUp = () => {} } = {}) {
+  constructor(activity, { onKeyboard = () => {}, onPointer = () => {} } = {}) {
     this.activity = activity;
-    this.onMouseUp = onMouseUp;
+    this.onKeyboard = onKeyboard;
+    this.onPointer = onPointer;
     this.lastMoveAt = 0;
+    this.running = false;
     this.handlers = {
-      keydown: () => this.activity.noteKeyboard(),
-      mousedown: () => this.activity.notePointerAction(),
-      mouseup: () => this.onMouseUp(),
+      keydown: () => {
+        this.onKeyboard();
+        this.activity.noteKeyboard();
+      },
+      mousedown: () => {
+        this.onPointer();
+        this.activity.notePointerAction();
+      },
+      mouseup: () => {},
       wheel: () => this.activity.notePointerAction(),
       mousemove: () => {
         const now = Date.now();
@@ -22,16 +30,29 @@ export class GlobalInput {
   start() {
     // Event details are intentionally ignored. RemieGPT only needs to know
     // that an input happened; it never stores keys, text, or coordinates.
-    for (const [event, handler] of Object.entries(this.handlers)) {
-      uIOhook.on(event, handler);
+    if (this.running) return true;
+    try {
+      for (const [event, handler] of Object.entries(this.handlers)) {
+        uIOhook.on(event, handler);
+      }
+      uIOhook.start();
+      this.running = true;
+      return true;
+    } catch (error) {
+      for (const [event, handler] of Object.entries(this.handlers)) {
+        uIOhook.off(event, handler);
+      }
+      console.warn("global-input", error?.message ?? "could not start");
+      return false;
     }
-    uIOhook.start();
   }
 
   stop() {
+    if (!this.running) return;
     for (const [event, handler] of Object.entries(this.handlers)) {
       uIOhook.off(event, handler);
     }
     uIOhook.stop();
+    this.running = false;
   }
 }

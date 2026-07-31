@@ -6,6 +6,7 @@ import chokidar from "chokidar";
 
 const MAX_STARTUP_BYTES = 256 * 1024;
 const STALE_TASK_MS = 30 * 60 * 1000;
+const MIN_WRITING_VISIBLE_MS = 220;
 
 function contentTypes(record) {
   const content = record?.message?.content;
@@ -28,6 +29,15 @@ export function classifyCodexRecord(record) {
   ) {
     return "waiting";
   }
+  // Codex writes the text that actually appears in the conversation as a
+  // response item. This is the moment Remi should start the writing animation.
+  if (
+    outer === "response_item" &&
+    type === "message" &&
+    (payload.role === "assistant" || payload.role === undefined)
+  ) {
+    return "writing";
+  }
   if (outer !== "event_msg") return null;
   if (/request_user_input|needs_user_input|approval_request/i.test(type)) {
     return "waiting";
@@ -39,6 +49,9 @@ export function classifyCodexRecord(record) {
   ) {
     return "thinking";
   }
+  // Any assistant text that Codex adds to the visible conversation — interim
+  // commentary or the final answer — is writing. A following reasoning event
+  // immediately moves Remi back to thinking.
   if (type === "agent_message") return "writing";
   if (type === "task_complete") return "stop";
   return null;
@@ -163,6 +176,40 @@ class JsonlSource {
         this.remove(filePath);
       }
     });
+    // A protected or temporarily unavailable history folder must only disable
+    // this source, never take down the floating companion itself.
+    this.watcher.on("error", () => {});
+  }
+
+  clearDeferredTransition(state) {
+    clearTimeout(state.transitionTimer);
+    state.transitionTimer = null;
+    state.pendingMode = null;
+  }
+
+  emitMode(filePath, state, mode) {
+    this.clearDeferredTransition(state);
+    if (state.active === mode) return;
+    state.active = mode;
+    if (mode === "writing") state.writingSince = Date.now();
+    this.onChange(`${this.name}:${filePath}`, mode);
+  }
+
+  emitAfterWriting(filePath, state, mode) {
+    const elapsed = Date.now() - state.writingSince;
+    const delay = Math.max(0, MIN_WRITING_VISIBLE_MS - elapsed);
+    if (!delay) {
+      this.emitMode(filePath, state, mode);
+      return;
+    }
+    state.pendingMode = mode;
+    clearTimeout(state.transitionTimer);
+    state.transitionTimer = setTimeout(() => {
+      state.transitionTimer = null;
+      const pendingMode = state.pendingMode;
+      state.pendingMode = null;
+      if (pendingMode !== null) this.emitMode(filePath, state, pendingMode);
+    }, delay);
   }
 
   attach(filePath) {
@@ -174,7 +221,10 @@ class JsonlSource {
           rest: "",
           active: false,
           touchedAt: stat.mtimeMs,
-          stopTimer: null
+          stopTimer: null,
+          transitionTimer: null,
+          pendingMode: null,
+          writingSince: 0
         });
         return;
       }
@@ -197,14 +247,12 @@ class JsonlSource {
       this.files.set(filePath, {
         offset: size,
         rest: "",
-        active:
-          lastSignal === "thinking" ||
-          lastSignal === "writing" ||
-          lastSignal === "waiting"
-            ? lastSignal
-            : false,
+        active: false,
         touchedAt: stat.mtimeMs,
-        stopTimer: null
+        stopTimer: null,
+        transitionTimer: null,
+        pendingMode: null,
+        writingSince: 0
       });
 
       if (
@@ -212,7 +260,7 @@ class JsonlSource {
         lastSignal === "writing" ||
         lastSignal === "waiting"
       ) {
-        this.onChange(`${this.name}:${filePath}`, lastSignal);
+        this.emitMode(filePath, this.files.get(filePath), lastSignal);
       }
     } catch {
       // File can disappear while the watcher is attaching.
@@ -248,23 +296,27 @@ class JsonlSource {
         ) {
           clearTimeout(state.stopTimer);
           state.stopTimer = null;
-          if (state.active !== signal) {
-            state.active = signal;
-            this.onChange(`${this.name}:${filePath}`, signal);
+          if (signal === "writing") {
+            this.emitMode(filePath, state, signal);
+          } else if (state.active === "writing") {
+            this.emitAfterWriting(filePath, state, signal);
+          } else {
+            this.emitMode(filePath, state, signal);
           }
         } else if (signal === "stop" && state.active) {
           clearTimeout(state.stopTimer);
           const finish = () => {
             state.stopTimer = null;
             if (!state.active) return;
-            state.active = false;
-            this.onChange(`${this.name}:${filePath}`, false);
+            if (state.active === "writing") {
+              this.emitAfterWriting(filePath, state, false);
+            } else {
+              this.emitMode(filePath, state, false);
+            }
           };
-          if (state.active === "writing") {
-            state.stopTimer = setTimeout(finish, 2400);
-          } else {
-            finish();
-          }
+          // State changes must interrupt the current animation immediately.
+          // Waiting for a writing GIF tail made Remi appear one session behind.
+          finish();
         }
       }
     } catch {
@@ -276,6 +328,7 @@ class JsonlSource {
     for (const [filePath, state] of this.files) {
       if (state.active && now - state.touchedAt >= STALE_TASK_MS) {
         clearTimeout(state.stopTimer);
+        this.clearDeferredTransition(state);
         state.stopTimer = null;
         state.active = false;
         this.onChange(`${this.name}:${filePath}`, false);
@@ -286,6 +339,7 @@ class JsonlSource {
   remove(filePath) {
     const state = this.files.get(filePath);
     clearTimeout(state?.stopTimer);
+    this.clearDeferredTransition(state ?? {});
     if (state?.active) {
       this.onChange(`${this.name}:${filePath}`, false);
     }
@@ -295,6 +349,7 @@ class JsonlSource {
   async stop() {
     for (const state of this.files.values()) {
       clearTimeout(state.stopTimer);
+      this.clearDeferredTransition(state);
     }
     await this.watcher?.close();
   }
