@@ -1,5 +1,5 @@
 const STOP_TEXT =
-  /^(stop|stop generating|stop response|stop responding|dừng|dừng tạo|dừng phản hồi|ngừng tạo|ngừng phản hồi)$/i;
+  /^(stop|stop generating|stop response|stop responding|cancel|dừng|dừng tạo|dừng phản hồi|ngừng tạo|ngừng phản hồi|hủy)$/i;
 
 const DIRECT_SELECTORS = [
   '[data-testid="stop-button"]',
@@ -9,6 +9,7 @@ const DIRECT_SELECTORS = [
   'button[aria-label*="Stop generating" i]',
   'button[aria-label*="Stop response" i]',
   'button[aria-label*="Stop responding" i]',
+  'button[aria-label*="Cancel" i]',
   'button[aria-label*="Dừng tạo" i]',
   'button[aria-label*="Dừng phản hồi" i]',
   'button[title*="Stop generating" i]',
@@ -58,6 +59,15 @@ function isGenerating() {
 
 function generationMode() {
   const thinkingSelectors = [
+    // Stable site-specific signals used by ChatGPT, Claude, and Gemini.
+    '[data-testid="reasoning-block"]',
+    '.reasoning-block',
+    '[data-testid="thinking-block"]',
+    '.thinking-block',
+    '[data-is-thinking="true"]',
+    'gdm-thought-viewer',
+    'thought-viewer',
+    '.thought-container',
     '[data-testid*="thinking" i]',
     '[aria-label*="Thinking" i]',
     '[aria-label*="Reasoning" i]',
@@ -101,6 +111,7 @@ new MutationObserver(scheduleReport).observe(document.documentElement, {
     "aria-label",
     "aria-busy",
     "data-is-streaming",
+    "data-is-thinking",
     "data-state",
     "disabled"
   ]

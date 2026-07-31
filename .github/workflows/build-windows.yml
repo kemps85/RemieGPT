@@ -25,12 +25,15 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev
+
       - name: Build installer and portable EXE
         run: npm run build:win
 
-      - name: Package browser helper
+      - name: Package browser helper and checksums
         shell: pwsh
-        run: Compress-Archive -Path browser-extension\* -DestinationPath dist\RemieGPT-Browser-Helper.zip -Force
+        run: ./scripts/package-release.ps1
 
       - name: Upload Windows files
         uses: actions/upload-artifact@v7
@@ -39,4 +42,5 @@ jobs:
           path: |
             dist/*.exe
             dist/RemieGPT-Browser-Helper.zip
+            dist/SHA256SUMS.txt
           if-no-files-found: error

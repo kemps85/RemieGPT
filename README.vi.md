@@ -2,93 +2,181 @@
 
 [English README](README.md)
 
-RemieGPT là bạn đồng hành nổi riêng trên Windows, được làm từ đúng các GIF Remi
-gốc trong repo. Remi xuất hiện phía trên cửa sổ thường lẫn cửa sổ phóng to,
-phản ứng với bàn phím/chuột trên toàn máy và đổi animation theo trạng thái của
-những AI được hỗ trợ.
+RemieGPT là Remi nổi riêng trên màn hình Windows. Remi vẫn ở đó khi m chuyển
+giữa Chrome, Word, Codex hoặc ứng dụng khác, và đổi GIF theo lúc m gõ, lúc AI
+suy nghĩ, lúc AI trả lời và lúc AI hoàn thành.
 
 ![Remi đang viết](assets/source/writing.gif)
 
-Đây là app Windows độc lập, không còn là Codex Pet. App phát thẳng toàn bộ GIF
-gốc nên không bị giới hạn còn vài khung hình như spritesheet của Codex Pet.
+App dùng trực tiếp các GIF gốc trong repo, không tạo, vẽ lại hoặc thay thế ảnh.
+Đây là app Windows độc lập, không còn phụ thuộc vào Codex Pet.
 
-## Tải và chạy
+## Cài nhanh cho người dùng bình thường
 
-Vào mục **Releases** của repo rồi tải một trong hai file:
+1. Mở trang [Releases](https://github.com/kemps85/RemieGPT/releases/latest).
+2. Tải `RemieGPT-Setup-...-x64.exe`.
+3. Nhấp đúp file vừa tải, chọn **Next → Install → Finish**.
+4. Remi sẽ xuất hiện ở góc màn hình. Lần sau mở bằng shortcut **RemieGPT** ở
+   Desktop hoặc Start Menu.
 
-- `RemieGPT-Setup-*-x64.exe`: bản cài đặt, tự tạo shortcut ngoài Desktop và
-  Start Menu.
-- `RemieGPT-Portable-*-x64.exe`: mở lên chạy ngay, không cần cài.
+Nếu chỉ muốn thử mà không cài, tải `RemieGPT-Portable-...-x64.exe` rồi mở trực
+tiếp. Bản Portable không tự tạo shortcut.
 
-Windows có thể hiện cảnh báo SmartScreen vì bản cộng đồng chưa có chứng thư ký
-phần mềm. Chỉ tải file phát hành từ đúng repo này.
+Nếu trang Releases chưa có file EXE thì bản đó chưa được phát hành công khai.
+M có thể chờ bản phát hành hoặc tự build bằng hướng dẫn bên dưới.
 
-Lần sau muốn bật Remi:
+### Windows hiện “Windows protected your PC” thì sao?
 
-- mở shortcut **RemieGPT** ngoài Desktop hoặc Start Menu nếu dùng bản cài;
-- mở lại file Portable nếu dùng bản chạy thẳng;
-- hoặc bật **Mở cùng Windows** trong biểu tượng Remi cạnh đồng hồ.
+RemieGPT là dự án cộng đồng chưa mua chứng thư ký phần mềm nên Windows có thể
+cảnh báo. Cảnh báo này không tự chứng minh file có virus, nhưng cũng không nên
+bấm bỏ qua một cách mù quáng.
 
-## Điều khiển
+Ba cách an toàn hơn:
 
-- Giữ chuột trái lên Remi rồi kéo để di chuyển.
-- Nhấp phải biểu tượng Remi cạnh đồng hồ để đổi kích thước, đưa về góc phải,
-  ẩn hoặc thoát.
-- Bật **Cho chuột xuyên qua Remi** nếu muốn bấm vào ứng dụng nằm dưới Remi.
-  Muốn kéo lại thì tắt mục này từ biểu tượng cạnh đồng hồ. Chế độ xuyên chuột
-  tự tắt mỗi lần mở lại RemieGPT nên Remi sẽ không bị kẹt vĩnh viễn.
+1. Chỉ tải từ đúng repo `kemps85/RemieGPT`, sau đó kiểm tra mã SHA256.
+2. Quét file bằng Windows Security.
+3. Nếu vẫn không tin file dựng sẵn, tải mã nguồn, tự xem và tự build trên máy.
 
-## Khi nào dùng animation nào
+Các bước kiểm tra và tự build được viết ở mục **Tự kiểm tra mã nguồn và tự tạo
+EXE** bên dưới.
 
-| Trường hợp | GIF nguồn |
+## Cách sử dụng
+
+- **Di chuyển:** giữ chuột trái trên Remi rồi kéo tới vị trí muốn đặt. Có thể
+  kéo qua màn hình khác.
+- **Đổi kích thước:** nhấp phải biểu tượng Remi cạnh đồng hồ, chọn lớn hơn hoặc
+  nhỏ hơn.
+- **Cho phép bấm xuyên qua Remi:** bật **Cho chuột xuyên qua Remi** trong menu
+  cạnh đồng hồ. Muốn kéo lại thì chọn **Cho phép kéo Remi**. Chế độ xuyên chuột
+  tự tắt khi mở lại app nên Remi không bị kẹt.
+- **Mở cùng Windows:** bật **Mở cùng Windows** trong menu cạnh đồng hồ.
+- **Ẩn hoặc thoát:** dùng menu cạnh đồng hồ. Nút đóng không hiện trên Remi vì
+  cửa sổ của Remi trong suốt.
+- **Đưa về vị trí cũ:** chọn **Đưa Remi về góc phải**.
+
+## Dùng với AI
+
+### Codex và Claude Code
+
+Không cần cài thêm gì. RemieGPT tự nhận trạng thái từ tiến trình cục bộ của:
+
+- Codex desktop và Codex CLI;
+- Claude Code.
+
+### ChatGPT, Claude, Gemini và AI trên web
+
+Trình duyệt không cho app bên ngoài tự biết trang AI đang trả lời, nên cần cài
+phần hỗ trợ web một lần:
+
+1. Nhấp phải biểu tượng Remi cạnh đồng hồ.
+2. Chọn **Mở phần hỗ trợ AI trên web**. Một thư mục sẽ mở ra.
+3. Trong Chrome mở `chrome://extensions`. Trong Edge mở `edge://extensions`.
+4. Bật **Developer mode / Chế độ dành cho nhà phát triển**.
+5. Bấm **Load unpacked / Tải tiện ích đã giải nén**.
+6. Chọn đúng thư mục vừa được RemieGPT mở.
+7. Tải lại tab ChatGPT/Claude/Gemini đang mở.
+
+Phần hỗ trợ web nhận ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity,
+DeepSeek và Grok. ChatGPT, Claude và Gemini có thêm dấu hiệu nhận biết riêng;
+các trang còn lại dùng cách nhận biết chung.
+
+## Ý nghĩa animation
+
+| Trường hợp | GIF dùng |
 | --- | --- |
 | Không có hoạt động | `idle.gif` |
 | M gõ trong bất kỳ ứng dụng Windows nào | `writing.gif` |
 | AI được hỗ trợ đang suy nghĩ | `thinking.gif` |
-| AI bắt đầu hiện câu trả lời | `writing.gif` |
-| AI cần m trả lời hoặc xác nhận | `waiting-input.gif` |
-| AI hoàn thành | `result.gif` |
+| AI đang hiện câu trả lời | `writing.gif` |
+| AI thật sự cần m trả lời hoặc xác nhận | `waiting-input.gif` |
+| AI vừa hoàn thành | `result.gif` |
 
-Phần nhận bàn phím chỉ biết rằng vừa có một phím được bấm. RemieGPT không lưu
-mã phím, nội dung m gõ, mật khẩu, clipboard, ảnh màn hình hoặc tọa độ chuột.
+`waiting-input.gif` không phải trạng thái đứng yên. Nó chỉ xuất hiện khi AI
+thực sự hỏi lại hoặc yêu cầu xác nhận.
 
-## Hỗ trợ AI
+## Quyền riêng tư: app nhìn thấy gì?
 
-Codex và Claude Code hoạt động ngay, không cần cài thêm vào trình duyệt:
+- Bộ nhận bàn phím chỉ biết **vừa có một phím được bấm**. Code không lấy ký tự,
+  không lưu nội dung m gõ và không đọc clipboard.
+- Với Codex/Claude, app đọc loại sự kiện mới được ghi vào file tiến trình cục
+  bộ để phân biệt thinking, writing, waiting và complete. App không gửi cuộc
+  trò chuyện đi đâu.
+- Khi cần nhận AI đang đổ chữ trong cửa sổ Codex/Claude, app lấy một ảnh thu nhỏ
+  của đúng cửa sổ đó, so sánh thay đổi trong RAM rồi bỏ đi. Ảnh không được lưu.
+- Phần hỗ trợ web chỉ gửi trạng thái `thinking/writing/finished` về
+  `127.0.0.1` trên chính máy. Nó không gửi prompt hoặc câu trả lời ra Internet.
+- App không có quảng cáo, telemetry hoặc tài khoản đăng nhập riêng.
 
-- Codex desktop và Codex CLI
-- Claude Code
+## Tự kiểm tra mã nguồn và tự tạo EXE
 
-Muốn nhận trạng thái của AI trên web:
+Phần này dành cho người không muốn tin file EXE dựng sẵn.
 
-1. Nhấp phải biểu tượng Remi cạnh đồng hồ, chọn **Mở phần hỗ trợ AI trên web**.
-2. Mở `chrome://extensions` hoặc `edge://extensions`.
-3. Bật **Developer mode / Chế độ dành cho nhà phát triển**.
-4. Chọn **Load unpacked / Tải tiện ích đã giải nén**, rồi chọn thư mục vừa mở.
+### Cách dễ nhất, không cần biết Git
 
-Phần đi kèm hiện nhận ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity,
-DeepSeek và Grok. Nó chỉ kiểm tra trang có đang hiện dấu hiệu suy nghĩ/trả lời
-hay không rồi gửi trạng thái có/không cho RemieGPT trên cùng máy; không gửi nội
-dung câu hỏi hoặc câu trả lời.
-
-Không có một dấu hiệu “AI đang suy nghĩ” dùng chung cho mọi phần mềm. AI chưa
-được hỗ trợ cần thêm cách nhận diện riêng thì Remi mới phân biệt chính xác được.
-
-## Clone repo và build EXE
-
-Yêu cầu:
-
-- Windows 10 hoặc Windows 11 bản x64
-- Node.js 22.12 trở lên
-- Git
-
-Clone repo xong, nhấp đúp:
+1. Cài [Node.js](https://nodejs.org/) bản 22.12 trở lên cho Windows x64.
+2. Ở trang Release muốn dùng, tải **Source code (zip)**.
+3. Giải nén ZIP ra một thư mục bình thường, ví dụ `Documents\RemieGPT`.
+4. Mở thư mục vừa giải nén và nhấp đúp `build-windows.cmd`.
+5. Cửa sổ màu đen sẽ tự:
+   - cài đúng phiên bản thư viện đã khóa trong `package-lock.json`;
+   - chạy toàn bộ test;
+   - kiểm tra thư viện chạy thật có cảnh báo bảo mật hay không;
+   - tạo installer, bản Portable, phần hỗ trợ trình duyệt và mã SHA256.
+6. Khi hoàn thành, thư mục `dist` tự mở. Dùng một trong hai file:
 
 ```text
-build-windows.cmd
+dist\RemieGPT-Setup-<version>-x64.exe
+dist\RemieGPT-Portable-<version>-x64.exe
 ```
 
-Hoặc chạy trong Command Prompt:
+Không cần cài Git nếu dùng Source code ZIP. Lần build đầu cần Internet để npm
+tải Electron và các thư viện ghi trong lockfile.
+
+### Nên xem những file nào trước khi build?
+
+| File/thư mục | Chức năng |
+| --- | --- |
+| `package.json` | Danh sách thư viện và lệnh đóng gói |
+| `package-lock.json` | Khóa chính xác phiên bản và mã toàn vẹn của thư viện |
+| `desktop/main.js` | Tạo cửa sổ Remi, menu và khởi động các bộ nhận biết |
+| `desktop/global-input.js` | Chỉ nhận sự kiện có thao tác bàn phím/chuột |
+| `desktop/ai-monitor.js` | Nhận loại sự kiện Codex/Claude từ file cục bộ |
+| `desktop/visual-writing-monitor.js` | So sánh ảnh thu nhỏ trong RAM, không lưu ảnh |
+| `desktop/web-ai-server.js` | Chỉ nhận kết nối từ máy local |
+| `browser-extension/` | Toàn bộ code của phần hỗ trợ AI trên web |
+| `.github/workflows/` | Lệnh GitHub dùng để test, build và phát hành |
+
+Toàn bộ code chạy chính nằm trong các file JavaScript/PowerShell đọc được bằng
+Notepad hoặc VS Code; không có file thực thi bí mật được cất trong source.
+
+### Tự chạy từng lệnh
+
+Người quen Command Prompt có thể chạy:
+
+```bat
+npm ci
+npm test
+npm audit --omit=dev
+npm run build:win
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\package-release.ps1
+```
+
+### Kiểm tra SHA256 của file tải từ Release
+
+Release có file `SHA256SUMS.txt`. Mở PowerShell trong thư mục tải xuống rồi chạy:
+
+```powershell
+Get-FileHash .\RemieGPT-Setup-0.2.0-x64.exe -Algorithm SHA256
+```
+
+Chuỗi `Hash` phải giống dòng cùng tên trong `SHA256SUMS.txt`. SHA256 chỉ xác
+nhận file m tải giống file được repo phát hành; nó không tự chứng minh chương
+trình hoàn toàn an toàn. Build lại từ mã nguồn là cách kiểm tra độc lập hơn.
+
+File tự build có thể không có SHA256 giống hệt file Release vì thời gian đóng
+gói và metadata có thể khác, dù dùng cùng mã nguồn.
+
+## Build bằng Git
 
 ```bat
 git clone https://github.com/kemps85/RemieGPT.git
@@ -96,33 +184,26 @@ cd RemieGPT
 build-windows.cmd
 ```
 
-Sau khi kiểm tra xong, hai file EXE nằm trong `dist`:
-
-```text
-dist\RemieGPT-Setup-<version>-x64.exe
-dist\RemieGPT-Portable-<version>-x64.exe
-```
-
-Các lệnh tương đương:
-
-```bat
-npm ci
-npm test
-npm run build:win
-```
-
-## Giới hạn trên Windows
+## Giới hạn
 
 - Remi nổi trên cửa sổ thường và cửa sổ phóng to.
-- Màn hình khóa, màn hình xin quyền quản trị của Windows và một số game dùng
-  chế độ toàn màn hình riêng có thể che overlay.
-- Bản này chỉ nhắm Windows x64 vì đây là nền tảng đã được kiểm tra thật.
+- Màn hình khóa, cửa sổ xin quyền quản trị của Windows và một số game dùng chế
+  độ toàn màn hình riêng có thể che Remi.
+- Gõ phím trong mọi app đều nhận được animation viết, nhưng trạng thái thinking
+  của AI chỉ chính xác với các AI đã được hỗ trợ.
+- Bản phát hành hiện chỉ nhắm Windows x64 vì đây là nền tảng được kiểm tra thật.
 
-## Asset và giấy phép
+## Asset, nguồn tham khảo và giấy phép
 
-App chỉ dùng các GIF Remi trong `assets/source`. Icon app là một khung được lấy
-từ `idle.gif`; không dùng hình AI.
+App chỉ dùng GIF trong `assets/source`. Icon app là một khung lấy từ `idle.gif`;
+không dùng hình do AI tạo.
 
-Code của app dùng [LICENSE-CODE](LICENSE-CODE). Hình nhân vật và file phát hành
-phát sinh không tự động nằm trong giấy phép code nếu chủ sở hữu quyền chưa cấp
-phép riêng.
+Cách nhận tín hiệu web được tham khảo từ
+[Gemielle](https://github.com/Rainan1010/Gemielle) và
+[Remielle-Widget](https://github.com/qantrung-art/Remielle-Widget). Chi tiết ở
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Không sao chép asset từ hai
+repo đó.
+
+Code và tài liệu tuân theo [LICENSE-CODE](LICENSE-CODE). Quyền sử dụng hình nhân
+vật không tự động được cấp theo giấy phép code nếu chủ sở hữu hình chưa cấp phép
+riêng.

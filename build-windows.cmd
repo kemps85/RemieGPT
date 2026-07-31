@@ -18,14 +18,24 @@ echo [RemieGPT] Dang kiem tra...
 call npm test
 if errorlevel 1 goto :failed
 
+echo [RemieGPT] Dang kiem tra thu vien co loi bao mat khong...
+call npm audit --omit=dev
+if errorlevel 1 goto :failed
+
 echo [RemieGPT] Dang tao file EXE cho Windows...
 call npm run build:win
+if errorlevel 1 goto :failed
+
+echo [RemieGPT] Dang dong goi phan ho tro trinh duyet va ma SHA256...
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\package-release.ps1"
 if errorlevel 1 goto :failed
 
 echo.
 echo [RemieGPT] Da xong. Mo thu muc dist de lay:
 echo   RemieGPT-Setup-*-x64.exe
 echo   RemieGPT-Portable-*-x64.exe
+echo   RemieGPT-Browser-Helper.zip
+echo   SHA256SUMS.txt
 start "" "%~dp0dist"
 pause
 exit /b 0
