@@ -32,10 +32,11 @@ body {
   display: grid;
   place-items: center;
   cursor: grab;
-  -webkit-app-region: drag;
+  -webkit-app-region: no-drag;
+  touch-action: none;
 }
 
-#pet:active {
+#pet.dragging {
   cursor: grabbing;
 }
 

@@ -26,17 +26,17 @@ test("keyboard activity shows typing then returns to idle", () => {
   assert.deepEqual(emitted, ["typing", "idle"]);
 });
 
-test("mouse click uses pointer state", () => {
+test("mouse click records activity without stealing the current state", () => {
   const { emitted, state } = harness();
   state.notePointerAction();
-  assert.deepEqual(emitted, ["pointer"]);
+  assert.deepEqual(emitted, []);
 });
 
-test("long inactivity uses waiting state and movement wakes Remi", () => {
+test("long inactivity stays idle instead of pretending AI needs input", () => {
   const { emitted, state } = harness();
   state.noteIdleSeconds(45);
   state.notePointerMove();
-  assert.deepEqual(emitted, ["waiting", "idle"]);
+  assert.deepEqual(emitted, []);
 });
 
 test("hover takes priority over input states", () => {

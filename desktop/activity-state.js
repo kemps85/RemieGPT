@@ -7,10 +7,6 @@ export const PET_STATES = Object.freeze({
     asset: "writing.gif",
     label: "Đang gõ"
   },
-  pointer: {
-    asset: "waiting-input.gif",
-    label: "Đang thao tác"
-  },
   thinking: {
     asset: "thinking.gif",
     label: "AI đang suy nghĩ"
@@ -39,15 +35,13 @@ export class ActivityState {
     now = () => Date.now(),
     setTimer = setTimeout,
     clearTimer = clearTimeout,
-    typingHoldMs = 900,
-    pointerHoldMs = 650
+    typingHoldMs = 900
   }) {
     this.emit = emit;
     this.now = now;
     this.setTimer = setTimer;
     this.clearTimer = clearTimer;
     this.typingHoldMs = typingHoldMs;
-    this.pointerHoldMs = pointerHoldMs;
     this.state = "idle";
     this.lastInputAt = this.now();
     this.releaseTimer = null;
@@ -74,20 +68,10 @@ export class ActivityState {
 
   notePointerAction() {
     this.lastInputAt = this.now();
-    if (this.hovering) return;
-    this.scheduleRelease(this.pointerHoldMs);
-    this.setState("pointer");
   }
 
   notePointerMove() {
     this.lastInputAt = this.now();
-    if (
-      this.state === "waiting" &&
-      !this.hovering &&
-      !this.aiSources.size
-    ) {
-      this.setState("idle");
-    }
   }
 
   setHovering(value) {
@@ -105,8 +89,6 @@ export class ActivityState {
     if (this.aiSources.size) return;
     if (seconds >= 45 && !this.hovering) {
       this.clearRelease();
-      this.setState("waiting");
-    } else if (seconds < 2 && this.state === "waiting" && !this.hovering) {
       this.setState("idle");
     }
   }
@@ -114,7 +96,7 @@ export class ActivityState {
   noteLock() {
     this.clearRelease();
     this.clearResult();
-    this.setState("waiting");
+    this.setState("idle");
   }
 
   noteUnlock() {
@@ -144,7 +126,7 @@ export class ActivityState {
         this.aiWaitingSources.delete(source);
       }
       this.pendingResult = false;
-      if (this.state === "typing" || this.state === "pointer") {
+      if (this.state === "typing") {
         return;
       } else {
         this.clearRelease();
@@ -157,14 +139,14 @@ export class ActivityState {
     this.aiWritingSources.delete(source);
     this.aiWaitingSources.delete(source);
     if (this.aiSources.size) {
-      if (this.state !== "typing" && this.state !== "pointer") {
+      if (this.state !== "typing") {
         this.setState(this.currentAiState());
       }
       return;
     }
 
     this.pendingResult = true;
-    if (this.state === "typing" || this.state === "pointer") return;
+    if (this.state === "typing") return;
     this.showResult();
   }
 
@@ -181,6 +163,11 @@ export class ActivityState {
     if (this.aiWritingSources.size) return "aiWriting";
     if (this.aiWaitingSources.size) return "waiting";
     return "thinking";
+  }
+
+  hasAiProvider(provider) {
+    const prefix = `${provider}:`;
+    return [...this.aiSources].some((source) => source.startsWith(prefix));
   }
 
   scheduleRelease(delay) {

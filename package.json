@@ -20,7 +20,6 @@
     "electron-builder": "26.15.3"
   },
   "dependencies": {
-    "active-win": "9.0.0",
     "chokidar": "5.0.0",
     "uiohook-napi": "1.5.5",
     "ws": "8.21.1"
@@ -43,6 +42,10 @@
       {
         "from": "browser-extension",
         "to": "browser-extension"
+      },
+      {
+        "from": "desktop/helpers",
+        "to": "helpers"
       }
     ],
     "directories": {

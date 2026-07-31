@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   app,
   BrowserWindow,
+  desktopCapturer,
   ipcMain,
   Menu,
   nativeImage,
@@ -16,8 +17,11 @@ import {
 
 import { ActivityState, PET_STATES } from "./activity-state.js";
 import { AiMonitor } from "./ai-monitor.js";
+import { ForegroundMonitor } from "./foreground-monitor.js";
 import { GlobalInput } from "./global-input.js";
+import { VisualWritingMonitor } from "./visual-writing-monitor.js";
 import { WebAiServer } from "./web-ai-server.js";
+import { WindowDragController } from "./window-drag-controller.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SETTINGS_FILE = "settings.json";
@@ -29,11 +33,14 @@ let activity;
 let globalInput;
 let aiMonitor;
 let webAiServer;
+let foregroundMonitor;
+let visualWritingMonitor;
+let windowDragController;
 let idleTimer;
 let currentState = "idle";
 let saveBoundsTimer;
 let settings = {
-  settingsVersion: 2,
+  settingsVersion: 4,
   size: DEFAULT_SIZE,
   startWithWindows: false,
   clickThrough: false
@@ -50,10 +57,10 @@ function loadSettings() {
       ...settings,
       ...saved
     };
-    if ((saved.settingsVersion ?? 0) < 2) {
-      settings.settingsVersion = 2;
-      settings.clickThrough = false;
-    }
+    settings.settingsVersion = 4;
+    // Every launch starts draggable. Click-through remains available from the
+    // tray for the current session, but it must never strand Remi after restart.
+    settings.clickThrough = false;
   } catch {
     // First launch uses defaults.
   }
@@ -209,6 +216,11 @@ function createWindow() {
     }
   });
 
+  windowDragController = new WindowDragController({
+    getWindow: () => mainWindow,
+    getCursor: () => screen.getCursorScreenPoint()
+  });
+
   const keepAboveWindows = () => {
     if (!mainWindow || mainWindow.isDestroyed() || !mainWindow.isVisible()) {
       return;
@@ -275,7 +287,9 @@ function createTray() {
 
 function startActivityTracking() {
   activity = new ActivityState({ emit: sendState });
-  globalInput = new GlobalInput(activity);
+  globalInput = new GlobalInput(activity, {
+    onMouseUp: () => windowDragController?.stop()
+  });
   globalInput.start();
   aiMonitor = new AiMonitor((source, mode) => {
     activity.setAiMode(source, mode);
@@ -285,6 +299,19 @@ function startActivityTracking() {
     activity.setAiMode(source, mode);
   });
   webAiServer.start();
+  visualWritingMonitor = new VisualWritingMonitor({
+    desktopCapturer,
+    activity
+  });
+  const foregroundHelper = app.isPackaged
+    ? path.join(process.resourcesPath, "helpers", "foreground-window.ps1")
+    : path.join(app.getAppPath(), "desktop", "helpers", "foreground-window.ps1");
+  foregroundMonitor = new ForegroundMonitor({
+    helperPath: foregroundHelper,
+    onChange: (info) => visualWritingMonitor.setForeground(info)
+  });
+  visualWritingMonitor.start();
+  foregroundMonitor.start();
 
   idleTimer = setInterval(() => {
     activity.noteIdleSeconds(powerMonitor.getSystemIdleTime());
@@ -307,6 +334,15 @@ app.whenReady().then(() => {
   ipcMain.on("pet-hover", (_event, hovering) => {
     activity.setHovering(Boolean(hovering));
   });
+  ipcMain.on("drag-start", (_event, point) => {
+    if (settings.clickThrough) return;
+    const x = Number(point?.x);
+    const y = Number(point?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    windowDragController?.start({ x, y });
+  });
+  ipcMain.on("drag-move", () => windowDragController?.update());
+  ipcMain.on("drag-end", () => windowDragController?.stop());
 
   app.on("activate", () => {
     mainWindow.showInactive();
@@ -318,6 +354,9 @@ app.on("before-quit", async () => {
   clearInterval(idleTimer);
   clearTimeout(saveBoundsTimer);
   globalInput?.stop();
+  foregroundMonitor?.stop();
+  visualWritingMonitor?.stop();
+  windowDragController?.stop();
   await aiMonitor?.stop();
   await webAiServer?.stop();
   activity?.dispose();

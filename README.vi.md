@@ -35,7 +35,8 @@ Lần sau muốn bật Remi:
 - Nhấp phải biểu tượng Remi cạnh đồng hồ để đổi kích thước, đưa về góc phải,
   ẩn hoặc thoát.
 - Bật **Cho chuột xuyên qua Remi** nếu muốn bấm vào ứng dụng nằm dưới Remi.
-  Muốn kéo lại thì tắt mục này từ biểu tượng cạnh đồng hồ.
+  Muốn kéo lại thì tắt mục này từ biểu tượng cạnh đồng hồ. Chế độ xuyên chuột
+  tự tắt mỗi lần mở lại RemieGPT nên Remi sẽ không bị kẹt vĩnh viễn.
 
 ## Khi nào dùng animation nào
 
@@ -43,7 +44,6 @@ Lần sau muốn bật Remi:
 | --- | --- |
 | Không có hoạt động | `idle.gif` |
 | M gõ trong bất kỳ ứng dụng Windows nào | `writing.gif` |
-| M bấm hoặc cuộn chuột | `waiting-input.gif` |
 | AI được hỗ trợ đang suy nghĩ | `thinking.gif` |
 | AI bắt đầu hiện câu trả lời | `writing.gif` |
 | AI cần m trả lời hoặc xác nhận | `waiting-input.gif` |

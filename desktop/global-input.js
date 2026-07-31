@@ -1,12 +1,14 @@
 import { uIOhook } from "uiohook-napi";
 
 export class GlobalInput {
-  constructor(activity) {
+  constructor(activity, { onMouseUp = () => {} } = {}) {
     this.activity = activity;
+    this.onMouseUp = onMouseUp;
     this.lastMoveAt = 0;
     this.handlers = {
       keydown: () => this.activity.noteKeyboard(),
       mousedown: () => this.activity.notePointerAction(),
+      mouseup: () => this.onMouseUp(),
       wheel: () => this.activity.notePointerAction(),
       mousemove: () => {
         const now = Date.now();

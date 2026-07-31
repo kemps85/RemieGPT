@@ -36,7 +36,8 @@ To open RemieGPT later:
 - Right-click the Remi tray icon near the clock to change size, return Remi to
   the bottom-right corner, hide her, or quit.
 - Enable **Click through Remi** when you want mouse clicks to reach the app
-  underneath. Disable it again from the tray icon before dragging Remi.
+  underneath. Disable it again from the tray icon before dragging Remi. This
+  mode resets when RemieGPT restarts, so Remi can never stay stuck permanently.
 
 ## Animation rules
 
@@ -44,7 +45,6 @@ To open RemieGPT later:
 | --- | --- |
 | No activity | `idle.gif` |
 | You type in any Windows app | `writing.gif` |
-| Mouse click or scroll | `waiting-input.gif` |
 | Supported AI is thinking | `thinking.gif` |
 | Supported AI is displaying an answer | `writing.gif` |
 | AI needs an answer or approval | `waiting-input.gif` |
