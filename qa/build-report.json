@@ -1,0 +1,245 @@
+{
+  "ok": true,
+  "policy": "source-only",
+  "image_generation_used": false,
+  "transformations": [
+    "frame selection",
+    "stable crop",
+    "uniform resize",
+    "atlas composition"
+  ],
+  "cell_size": [
+    192,
+    208
+  ],
+  "atlas_size": [
+    1536,
+    1872
+  ],
+  "rows": [
+    {
+      "state": "idle",
+      "source": "assets/source/calm.gif",
+      "source_sha256": "c681be0ca465d07cf666270e79ee849a12c21328d60fb5d4732dddb7f3f13e98",
+      "source_total_frames": 102,
+      "selected_indices": [
+        0,
+        17,
+        34,
+        51,
+        68,
+        85
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 0,
+      "output_frames": 6
+    },
+    {
+      "state": "running-right",
+      "source": "assets/source/busy-spiral-a.gif",
+      "source_sha256": "70dd2bd4b3b0c43b1dc8333240df7ae3bf43ab8704c8d71ef73824757db7000b",
+      "source_total_frames": 59,
+      "selected_indices": [
+        0,
+        7,
+        14,
+        22,
+        29,
+        36,
+        44,
+        51
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 1,
+      "output_frames": 8
+    },
+    {
+      "state": "running-left",
+      "source": "assets/source/busy-spiral-b.gif",
+      "source_sha256": "816d155e0b6ac71e814d660ce791715d407fef20f6527c3b2f13cace8c5e146b",
+      "source_total_frames": 102,
+      "selected_indices": [
+        0,
+        12,
+        25,
+        38,
+        51,
+        63,
+        76,
+        89
+      ],
+      "selected_durations_ms": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ],
+      "atlas_row": 2,
+      "output_frames": 8
+    },
+    {
+      "state": "waving",
+      "source": "assets/source/happy-review.gif",
+      "source_sha256": "bff1c39c8e281f4d0ebeb5734fd8fef9de9492fee50757fd80035e8818e8c1f5",
+      "source_total_frames": 51,
+      "selected_indices": [
+        0,
+        12,
+        25,
+        38
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 3,
+      "output_frames": 4
+    },
+    {
+      "state": "jumping",
+      "source": "assets/source/happy-review.gif",
+      "source_sha256": "bff1c39c8e281f4d0ebeb5734fd8fef9de9492fee50757fd80035e8818e8c1f5",
+      "source_total_frames": 51,
+      "selected_indices": [
+        0,
+        10,
+        20,
+        30,
+        40
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 4,
+      "output_frames": 5
+    },
+    {
+      "state": "failed",
+      "source": "assets/source/tired.gif",
+      "source_sha256": "674dc6cf5fc715446676b6e96959758bc738c48a45c565e1b32623e280d20351",
+      "source_total_frames": 136,
+      "selected_indices": [
+        0,
+        17,
+        34,
+        51,
+        68,
+        85,
+        102,
+        119
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 5,
+      "output_frames": 8
+    },
+    {
+      "state": "waiting",
+      "source": "assets/source/waiting.gif",
+      "source_sha256": "4f7eab7f245122d637bfd7296d1bb51aba09fa335595ee7d65e49d774374246c",
+      "source_total_frames": 135,
+      "selected_indices": [
+        0,
+        22,
+        45,
+        67,
+        90,
+        112
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 6,
+      "output_frames": 6
+    },
+    {
+      "state": "running",
+      "source": "assets/source/busy-spiral-b.gif",
+      "source_sha256": "816d155e0b6ac71e814d660ce791715d407fef20f6527c3b2f13cace8c5e146b",
+      "source_total_frames": 102,
+      "selected_indices": [
+        0,
+        17,
+        34,
+        51,
+        68,
+        85
+      ],
+      "selected_durations_ms": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ],
+      "atlas_row": 7,
+      "output_frames": 6
+    },
+    {
+      "state": "review",
+      "source": "assets/source/happy-review.gif",
+      "source_sha256": "bff1c39c8e281f4d0ebeb5734fd8fef9de9492fee50757fd80035e8818e8c1f5",
+      "source_total_frames": 51,
+      "selected_indices": [
+        0,
+        8,
+        17,
+        25,
+        34,
+        42
+      ],
+      "selected_durations_ms": [
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "atlas_row": 8,
+      "output_frames": 6
+    }
+  ],
+  "spritesheet": "pet/remi/spritesheet.webp",
+  "spritesheet_sha256": "ae32454361672a3aeaa382ea7fe65955379e0da7b262d72f3796235f052c0e8e"
+}

@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "visual_qa": "pass",
+  "qa_note": "All used cells and nine preview loops preserve the supplied Remielle source identity, remain complete, uncropped, consistently scaled, transparent, and visually stable.",
+  "source_limitations": [
+    "waving, jumping, and review reuse the happy-review pose family",
+    "directional movement uses busy-spiral families and is approximate"
+  ],
+  "repair_notes": []
+}
