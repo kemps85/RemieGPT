@@ -2,138 +2,127 @@
 
 [English README](README.md)
 
-Remi là một Codex Pet tùy chỉnh dựa trên Remielle. Cô bé sẽ đổi hoạt ảnh khi
-Codex đang làm việc, chờ người dùng, đã có kết quả hoặc gặp lỗi.
+RemieGPT là bạn đồng hành nổi riêng trên Windows, được làm từ đúng các GIF Remi
+gốc trong repo. Remi xuất hiện phía trên cửa sổ thường lẫn cửa sổ phóng to,
+phản ứng với bàn phím/chuột trên toàn máy và đổi animation theo trạng thái của
+những AI được hỗ trợ.
 
-Spritesheet phát hành chỉ được ghép từ sáu GIF nguồn có sẵn trong repo. Không
-dùng frame AI, không vẽ lại nhân vật và không thêm chi tiết mới.
+![Remi đang viết](assets/source/writing.gif)
 
-![Remi đang làm việc trong Codex](qa/previews/running.gif)
+Đây là app Windows độc lập, không còn là Codex Pet. App phát thẳng toàn bộ GIF
+gốc nên không bị giới hạn còn vài khung hình như spritesheet của Codex Pet.
 
-## Yêu cầu
+## Tải và chạy
 
-- ChatGPT desktop có mục **Pets**, hoặc Codex CLI tương thích
-- Windows, macOS hoặc Linux
-- Không cần API key và không cần build project
+Vào mục **Releases** của repo rồi tải một trong hai file:
 
-## Cài trên Windows
+- `RemieGPT-Setup-*-x64.exe`: bản cài đặt, tự tạo shortcut ngoài Desktop và
+  Start Menu.
+- `RemieGPT-Portable-*-x64.exe`: mở lên chạy ngay, không cần cài.
 
-Clone hoặc tải ZIP của repo, mở PowerShell tại thư mục vừa tải rồi chạy:
+Windows có thể hiện cảnh báo SmartScreen vì bản cộng đồng chưa có chứng thư ký
+phần mềm. Chỉ tải file phát hành từ đúng repo này.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
-```
+Lần sau muốn bật Remi:
 
-Script sẽ cài Remi vào:
+- mở shortcut **RemieGPT** ngoài Desktop hoặc Start Menu nếu dùng bản cài;
+- mở lại file Portable nếu dùng bản chạy thẳng;
+- hoặc bật **Mở cùng Windows** trong biểu tượng Remi cạnh đồng hồ.
 
-```text
-%USERPROFILE%\.codex\pets\remi
-```
+## Điều khiển
 
-Nếu máy có biến `CODEX_HOME`, script sẽ dùng thư mục đó.
+- Giữ chuột trái lên Remi rồi kéo để di chuyển.
+- Nhấp phải biểu tượng Remi cạnh đồng hồ để đổi kích thước, đưa về góc phải,
+  ẩn hoặc thoát.
+- Bật **Cho chuột xuyên qua Remi** nếu muốn bấm vào ứng dụng nằm dưới Remi.
+  Muốn kéo lại thì tắt mục này từ biểu tượng cạnh đồng hồ.
 
-## Cài trên macOS hoặc Linux
+## Khi nào dùng animation nào
 
-Clone hoặc tải ZIP của repo, mở terminal tại thư mục vừa tải rồi chạy:
-
-```bash
-sh ./scripts/install.sh
-```
-
-Pet sẽ được cài vào:
-
-```text
-~/.codex/pets/remi
-```
-
-Nếu máy có biến `CODEX_HOME`, script sẽ dùng thư mục đó.
-
-## Cài thủ công
-
-Chép nguyên thư mục [`pet/remi`](pet/remi) vào:
-
-```text
-<CODEX_HOME>/pets/remi
-```
-
-Nếu không đặt `CODEX_HOME`, dùng:
-
-- Windows: `%USERPROFILE%\.codex\pets\remi`
-- macOS/Linux: `~/.codex/pets/remi`
-
-Thư mục sau khi cài phải có đủ:
-
-```text
-remi/
-├── pet.json
-└── spritesheet.webp
-```
-
-## Bật Remi
-
-1. Mở ứng dụng Codex desktop.
-2. Vào **Settings > Pets**.
-3. Chọn **Refresh**.
-4. Chọn **Remi**.
-5. Nhập `/pet`, hoặc mở command menu và chọn **Wake Pet**.
-
-Nhập `/pet` lần nữa để ẩn pet.
-
-Trong Codex CLI tương tác, nhập `/pets` hoặc `/pet` để mở danh sách pet. Pet
-trong terminal cần terminal hỗ trợ hiển thị hình ảnh.
-
-## Remi phản ứng thế nào
-
-| Trạng thái Codex | Hoạt ảnh Remi |
+| Trường hợp | GIF nguồn |
 | --- | --- |
-| Nghỉ | Thở nhẹ và chớp mắt |
-| Đang chạy task | Tập trung làm việc trên tablet |
-| Cần input | Chờ người dùng duyệt hoặc trả lời |
-| Đã xong | Xem lại kết quả |
-| Bị chặn/lỗi | Phản ứng khi gặp lỗi |
-| Kéo sang trái/phải | Di chuyển theo pet nổi |
+| Không có hoạt động | `idle.gif` |
+| M gõ trong bất kỳ ứng dụng Windows nào | `writing.gif` |
+| M bấm hoặc cuộn chuột | `waiting-input.gif` |
+| AI được hỗ trợ đang suy nghĩ | `thinking.gif` |
+| AI bắt đầu hiện câu trả lời | `writing.gif` |
+| AI cần m trả lời hoặc xác nhận | `waiting-input.gif` |
+| AI hoàn thành | `result.gif` |
 
-Bộ GIF gốc không có pose riêng cho kéo trái/phải, vẫy tay, nhảy hoặc nhìn theo
-con trỏ. Các hàng đó dùng lại loop gốc gần nhất thay vì tự chế thêm frame.
+Phần nhận bàn phím chỉ biết rằng vừa có một phím được bấm. RemieGPT không lưu
+mã phím, nội dung m gõ, mật khẩu, clipboard, ảnh màn hình hoặc tọa độ chuột.
 
-## Khắc phục lỗi
+## Hỗ trợ AI
 
-### Không thấy Remi trong danh sách pet
+Codex và Claude Code hoạt động ngay, không cần cài thêm vào trình duyệt:
 
-- Kiểm tra `pet.json` và `spritesheet.webp` nằm cùng thư mục `remi`.
-- Trong **Settings > Pets**, bấm **Refresh**.
-- Nếu cửa sổ chọn pet đã mở từ trước khi cài, hãy khởi động lại Codex.
-- Kiểm tra script đã dùng đúng `CODEX_HOME`.
+- Codex desktop và Codex CLI
+- Claude Code
 
-### Pet hiện nhưng không chuyển động
+Muốn nhận trạng thái của AI trên web:
 
-Pets tôn trọng cài đặt giảm chuyển động của hệ điều hành. Khi reduced motion
-đang bật, Codex dùng một frame tĩnh.
+1. Nhấp phải biểu tượng Remi cạnh đồng hồ, chọn **Mở phần hỗ trợ AI trên web**.
+2. Mở `chrome://extensions` hoặc `edge://extensions`.
+3. Bật **Developer mode / Chế độ dành cho nhà phát triển**.
+4. Chọn **Load unpacked / Tải tiện ích đã giải nén**, rồi chọn thư mục vừa mở.
 
-### Không thấy pet trong Codex IDE extension
+Phần đi kèm hiện nhận ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity,
+DeepSeek và Grok. Nó chỉ kiểm tra trang có đang hiện dấu hiệu suy nghĩ/trả lời
+hay không rồi gửi trạng thái có/không cho RemieGPT trên cùng máy; không gửi nội
+dung câu hỏi hoặc câu trả lời.
 
-IDE extension không có pet nổi. Hãy dùng ChatGPT desktop hoặc Codex CLI tương
-thích.
+Không có một dấu hiệu “AI đang suy nghĩ” dùng chung cho mọi phần mềm. AI chưa
+được hỗ trợ cần thêm cách nhận diện riêng thì Remi mới phân biệt chính xác được.
 
-## Kiểm tra package
+## Clone repo và build EXE
 
-Build lại pet từ đúng GIF nguồn:
+Yêu cầu:
 
-```bash
-python scripts/build_pet.py
+- Windows 10 hoặc Windows 11 bản x64
+- Node.js 22.12 trở lên
+- Git
+
+Clone repo xong, nhấp đúp:
+
+```text
+build-windows.cmd
 ```
 
-Chạy checker:
+Hoặc chạy trong Command Prompt:
 
-```bash
-python -m pip install -r requirements-dev.txt
-python scripts/validate_package.py
+```bat
+git clone https://github.com/kemps85/RemieGPT.git
+cd RemieGPT
+build-windows.cmd
 ```
 
-GitHub Actions cũng chạy checker này mỗi lần push hoặc mở pull request.
+Sau khi kiểm tra xong, hai file EXE nằm trong `dist`:
 
-## Giấy phép
+```text
+dist\RemieGPT-Setup-<version>-x64.exe
+dist\RemieGPT-Portable-<version>-x64.exe
+```
 
-Script cài đặt và tài liệu dùng [`LICENSE-CODE`](LICENSE-CODE). Hình nhân vật
-và spritesheet phát sinh không nằm trong giấy phép này nếu chủ sở hữu quyền
-không cấp phép riêng.
+Các lệnh tương đương:
+
+```bat
+npm ci
+npm test
+npm run build:win
+```
+
+## Giới hạn trên Windows
+
+- Remi nổi trên cửa sổ thường và cửa sổ phóng to.
+- Màn hình khóa, màn hình xin quyền quản trị của Windows và một số game dùng
+  chế độ toàn màn hình riêng có thể che overlay.
+- Bản này chỉ nhắm Windows x64 vì đây là nền tảng đã được kiểm tra thật.
+
+## Asset và giấy phép
+
+App chỉ dùng các GIF Remi trong `assets/source`. Icon app là một khung được lấy
+từ `idle.gif`; không dùng hình AI.
+
+Code của app dùng [LICENSE-CODE](LICENSE-CODE). Hình nhân vật và file phát hành
+phát sinh không tự động nằm trong giấy phép code nếu chủ sở hữu quyền chưa cấp
+phép riêng.

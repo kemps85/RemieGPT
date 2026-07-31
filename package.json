@@ -1,0 +1,69 @@
+{
+  "name": "remiegpt",
+  "version": "0.2.0",
+  "description": "Remi desktop companion for Codex on Windows",
+  "type": "module",
+  "main": "desktop/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test desktop/**/*.test.js",
+    "build:win": "electron-builder --win nsis portable",
+    "pack:win": "electron-builder --win dir"
+  },
+  "author": "kemps85",
+  "license": "SEE LICENSE IN LICENSE-CODE",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "electron": "43.2.0",
+    "electron-builder": "26.15.3"
+  },
+  "dependencies": {
+    "active-win": "9.0.0",
+    "chokidar": "5.0.0",
+    "uiohook-napi": "1.5.5",
+    "ws": "8.21.1"
+  },
+  "build": {
+    "appId": "com.kemps85.remiegpt",
+    "productName": "RemieGPT",
+    "asar": true,
+    "npmRebuild": false,
+    "asarUnpack": [
+      "node_modules/uiohook-napi/**/*"
+    ],
+    "files": [
+      "desktop/**/*",
+      "assets/source/**/*",
+      "assets/app-icon.png",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "browser-extension",
+        "to": "browser-extension"
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "assets/app-icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "artifactName": "RemieGPT-Setup-${version}-${arch}.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "portable": {
+      "artifactName": "RemieGPT-Portable-${version}-${arch}.${ext}"
+    }
+  }
+}
