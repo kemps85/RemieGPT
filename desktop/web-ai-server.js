@@ -24,7 +24,8 @@ export function parseWebAiMessage(value) {
     source: message.source.replace(/[^a-zA-Z0-9:._-]/g, "_"),
     active: message.active,
     mode:
-      message.active && message.mode === "thinking" ? "thinking" : "writing"
+      message.active && message.mode === "thinking" ? "thinking" : "writing",
+    showResult: message.reason !== "background"
   };
 }
 
@@ -62,12 +63,16 @@ export class WebAiServer {
         } else {
           activeSources.delete(source);
         }
-        this.onChange(source, message.active ? message.mode : false);
+        this.onChange(
+          source,
+          message.active ? message.mode : false,
+          { showResult: message.showResult }
+        );
       });
 
       socket.on("close", () => {
         for (const source of activeSources) {
-          this.onChange(source, false);
+          this.onChange(source, false, { showResult: false });
         }
         activeSources.clear();
       });

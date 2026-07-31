@@ -66,5 +66,5 @@ while ($true) {
         [Console]::Out.WriteLine($json)
         [Console]::Out.Flush()
     }
-    Start-Sleep -Milliseconds 250
+    Start-Sleep -Milliseconds 80
 }

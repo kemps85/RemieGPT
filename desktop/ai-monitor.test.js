@@ -44,11 +44,25 @@ test("Claude user prompt starts and final text ends thinking", () => {
   );
 });
 
-test("Codex visible messages switch to writing", () => {
+test("Codex switches between reasoning and every visible text update", () => {
+  assert.equal(
+    classifyCodexRecord({
+      type: "event_msg",
+      payload: { type: "agent_reasoning" }
+    }),
+    "thinking"
+  );
   assert.equal(
     classifyCodexRecord({
       type: "event_msg",
       payload: { type: "agent_message", phase: "commentary" }
+    }),
+    "writing"
+  );
+  assert.equal(
+    classifyCodexRecord({
+      type: "response_item",
+      payload: { type: "message", role: "assistant" }
     }),
     "writing"
   );

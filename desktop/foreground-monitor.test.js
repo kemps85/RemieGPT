@@ -29,3 +29,10 @@ test("ordinary apps are not treated as AI windows", () => {
     null
   );
 });
+
+test("terminal hosts are recognized for a recently started CLI task", () => {
+  assert.equal(
+    providerFor({ ownerName: "WindowsTerminal", title: "PowerShell" }),
+    "terminal"
+  );
+});

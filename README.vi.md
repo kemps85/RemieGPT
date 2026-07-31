@@ -2,14 +2,13 @@
 
 [English README](README.md)
 
-RemieGPT là Remi nổi riêng trên màn hình Windows. Remi vẫn ở đó khi bạn chuyển
-giữa Chrome, Word, Codex hoặc ứng dụng khác, và đổi GIF theo lúc bạn gõ, lúc AI
-suy nghĩ, lúc AI trả lời và lúc AI hoàn thành.
+RemieGPT là Remi nổi ở góc màn hình Windows. Remi đi theo bạn khi đổi giữa
+Chrome, Word, Codex hay app khác. Remi đổi ảnh khi bạn gõ, AI đang nghĩ, AI
+đang trả lời hoặc vừa xong việc.
 
 ![Remi đang viết](assets/source/writing.gif)
 
-App dùng trực tiếp các GIF gốc trong repo, không tạo, vẽ lại hoặc thay thế ảnh.
-Đây là app Windows độc lập, không còn phụ thuộc vào Codex Pet.
+App chỉ dùng GIF có sẵn trong repo. Không tạo ảnh mới và không phải Codex Pet.
 
 ## Cài nhanh cho người dùng bình thường
 
@@ -27,9 +26,9 @@ Bạn có thể chờ bản phát hành hoặc tự build bằng hướng dẫn 
 
 ### Windows hiện “Windows protected your PC” thì sao?
 
-RemieGPT là dự án cộng đồng chưa mua chứng thư ký phần mềm nên Windows có thể
-cảnh báo. Cảnh báo này không tự chứng minh file có virus, nhưng cũng không nên
-bấm bỏ qua một cách mù quáng.
+RemieGPT chưa có chứng chỉ phần mềm trả phí nên Windows có thể hiện cảnh báo.
+Điều đó không tự động có nghĩa là có virus, nhưng cũng đừng bỏ qua cảnh báo nếu
+bạn không biết file đến từ đâu.
 
 Ba cách an toàn hơn:
 
@@ -44,8 +43,8 @@ EXE** bên dưới.
 
 - **Di chuyển:** giữ chuột trái trên Remi rồi kéo tới vị trí muốn đặt. Có thể
   kéo qua màn hình khác.
-- **Đổi kích thước:** nhấp phải biểu tượng Remi cạnh đồng hồ, chọn lớn hơn hoặc
-  nhỏ hơn.
+- **Kích thước cố định:** Remi không có chức năng phóng/thu, nên kéo chỉ thay
+  đổi vị trí và không thể làm Remi to hoặc nhỏ đi.
 - **Cho phép bấm xuyên qua Remi:** bật **Cho chuột xuyên qua Remi** trong menu
   cạnh đồng hồ. Muốn kéo lại thì chọn **Cho phép kéo Remi**. Chế độ xuyên chuột
   tự tắt khi mở lại app nên Remi không bị kẹt.
@@ -53,6 +52,19 @@ EXE** bên dưới.
 - **Ẩn hoặc thoát:** dùng menu cạnh đồng hồ. Nút đóng không hiện trên Remi vì
   cửa sổ của Remi trong suốt.
 - **Đưa về vị trí cũ:** chọn **Đưa Remi về góc phải**.
+
+### Remi ưu tiên việc bạn đang làm
+
+Chỉ app hoặc tab đang mở trước mặt mới điều khiển Remi. Ví dụ Codex đang chạy
+ở Terminal A mà bạn chuyển sang Word hoặc Terminal B thì Remi bỏ trạng thái của
+Terminal A. Quay lại Terminal A thì Remi mới theo nó tiếp.
+
+Nói ngắn gọn: AI chạy nền không được làm Remi nhảy ảnh khi bạn đang làm việc
+khác.
+
+Nếu một cửa sổ Codex/Claude có nhiều đoạn chat, bấm sang đoạn chat khác sẽ bỏ
+trạng thái của đoạn chat cũ. Sau khi bạn gửi tin ở đoạn chat mới, Remi chỉ theo
+đoạn chat đó.
 
 ## Dùng với AI
 
@@ -65,8 +77,8 @@ Không cần cài thêm gì. RemieGPT tự nhận trạng thái từ tiến trì
 
 ### ChatGPT, Claude, Gemini và AI trên web
 
-Trình duyệt không cho app bên ngoài tự biết trang AI đang trả lời, nên cần cài
-phần hỗ trợ web một lần:
+Để Remi biết ChatGPT, Claude hay Gemini trên web đang nghĩ/trả lời, bạn cần cài
+thêm phần hỗ trợ web một lần:
 
 1. Nhấp phải biểu tượng Remi cạnh đồng hồ.
 2. Chọn **Mở phần hỗ trợ AI trên web**. Một thư mục sẽ mở ra.
@@ -77,8 +89,9 @@ phần hỗ trợ web một lần:
 7. Tải lại tab ChatGPT/Claude/Gemini đang mở.
 
 Phần hỗ trợ web nhận ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity,
-DeepSeek và Grok. ChatGPT, Claude và Gemini có thêm dấu hiệu nhận biết riêng;
-các trang còn lại dùng cách nhận biết chung.
+DeepSeek và Grok. ChatGPT, Claude và Gemini được nhận biết tốt nhất. Chỉ tab
+AI đang mở trước mặt mới điều khiển Remi. Chuyển sang YouTube, Word hoặc tab
+khác thì Remi bỏ qua AI chạy nền.
 
 ## Ý nghĩa animation
 
@@ -94,22 +107,33 @@ các trang còn lại dùng cách nhận biết chung.
 `waiting-input.gif` không phải trạng thái đứng yên. Nó chỉ xuất hiện khi AI
 thực sự hỏi lại hoặc yêu cầu xác nhận.
 
-## Quyền riêng tư: app nhìn thấy gì?
+## Nếu trông có vẻ không đúng
 
-- Bộ nhận bàn phím chỉ biết **vừa có một phím được bấm**. Code không lấy ký tự,
-  không lưu nội dung bạn gõ và không đọc clipboard.
-- Với Codex/Claude, app đọc loại sự kiện mới được ghi vào file tiến trình cục
-  bộ để phân biệt thinking, writing, waiting và complete. App không gửi cuộc
-  trò chuyện đi đâu.
-- Khi cần nhận AI đang đổ chữ trong cửa sổ Codex/Claude, app lấy một ảnh thu nhỏ
-  của đúng cửa sổ đó, so sánh thay đổi trong RAM rồi bỏ đi. Ảnh không được lưu.
-- Phần hỗ trợ web chỉ gửi trạng thái `thinking/writing/finished` về
-  `127.0.0.1` trên chính máy. Nó không gửi prompt hoặc câu trả lời ra Internet.
-- App không có quảng cáo, telemetry hoặc tài khoản đăng nhập riêng.
+- **Remi không thấy trên màn hình:** nhấp phải icon cạnh đồng hồ và chọn
+  **Đưa Remi về góc phải**. Nếu vừa rút màn hình phụ, lần mở tiếp theo Remi sẽ
+  tự trở về màn hình chính.
+- **AI chạy nền nhưng Remi không phản ứng:** đúng thiết kế. Hãy chuyển về đúng
+  cửa sổ/tab AI đó.
+- **Web AI không phản ứng:** kiểm tra RemieGPT vẫn đang mở, rồi tải lại tab AI
+  sau khi cài hoặc cập nhật phần hỗ trợ trình duyệt.
+- **Lỡ mở app hai lần:** bản mở sau chỉ đưa Remi đang chạy lên trước, không tạo
+  thêm một Remi khác.
+
+Người muốn kiểm tra trước khi dùng có thể theo [bảng test Windows](TESTING.vi.md).
+
+## App biết gì về bạn?
+
+- App chỉ biết là bạn vừa bấm phím hoặc chuột, không biết bạn đã bấm phím nào.
+  App không lưu chữ bạn gõ và không đọc clipboard.
+- Với Codex/Claude, app chỉ đọc dấu hiệu kiểu “đang nghĩ”, “đang viết”, “đang
+  chờ” từ file trên chính máy. App không gửi đoạn chat của bạn đi đâu.
+- Phần hỗ trợ web chỉ báo cho Remi biết AI đang nghĩ/viết/xong qua kết nối nội
+  bộ của chính máy. Nó không gửi prompt hay câu trả lời ra Internet.
+- App không có quảng cáo, tài khoản riêng hay theo dõi bạn dùng app thế nào.
 
 ## Tự kiểm tra mã nguồn và tự tạo EXE
 
-Phần này dành cho người không muốn tin file EXE dựng sẵn.
+Phần này dành cho ai không muốn chạy file EXE dựng sẵn.
 
 ### Cách dễ nhất, không cần biết Git
 
@@ -117,11 +141,8 @@ Phần này dành cho người không muốn tin file EXE dựng sẵn.
 2. Ở trang Release muốn dùng, tải **Source code (zip)**.
 3. Giải nén ZIP ra một thư mục bình thường, ví dụ `Documents\RemieGPT`.
 4. Mở thư mục vừa giải nén và nhấp đúp `build-windows.cmd`.
-5. Cửa sổ màu đen sẽ tự:
-   - cài đúng phiên bản thư viện đã khóa trong `package-lock.json`;
-   - chạy toàn bộ test;
-   - kiểm tra thư viện chạy thật có cảnh báo bảo mật hay không;
-   - tạo installer, bản Portable, phần hỗ trợ trình duyệt và mã SHA256.
+5. Cửa sổ màu đen sẽ tự cài những thứ cần thiết, tự kiểm tra rồi tạo bản Setup,
+   bản Portable, phần hỗ trợ trình duyệt và file kiểm tra SHA256.
 6. Khi hoàn thành, thư mục `dist` tự mở. Dùng một trong hai file:
 
 ```text
@@ -137,17 +158,15 @@ tải Electron và các thư viện ghi trong lockfile.
 | File/thư mục | Chức năng |
 | --- | --- |
 | `package.json` | Danh sách thư viện và lệnh đóng gói |
-| `package-lock.json` | Khóa chính xác phiên bản và mã toàn vẹn của thư viện |
-| `desktop/main.js` | Tạo cửa sổ Remi, menu và khởi động các bộ nhận biết |
-| `desktop/global-input.js` | Chỉ nhận sự kiện có thao tác bàn phím/chuột |
-| `desktop/ai-monitor.js` | Nhận loại sự kiện Codex/Claude từ file cục bộ |
-| `desktop/visual-writing-monitor.js` | So sánh ảnh thu nhỏ trong RAM, không lưu ảnh |
-| `desktop/web-ai-server.js` | Chỉ nhận kết nối từ máy local |
-| `browser-extension/` | Toàn bộ code của phần hỗ trợ AI trên web |
-| `.github/workflows/` | Lệnh GitHub dùng để test, build và phát hành |
+| `package-lock.json` | Ghi đúng phiên bản thư viện cần dùng |
+| `desktop/main.js` | Tạo cửa sổ Remi và menu |
+| `desktop/global-input.js` | Nhận biết bạn vừa bấm phím/chuột |
+| `desktop/ai-monitor.js` | Nhận biết trạng thái Codex/Claude |
+| `desktop/web-ai-server.js` | Nhận trạng thái từ phần hỗ trợ web trên máy |
+| `browser-extension/` | Code của phần hỗ trợ AI trên web |
 
-Toàn bộ code chạy chính nằm trong các file JavaScript/PowerShell đọc được bằng
-Notepad hoặc VS Code; không có file thực thi bí mật được cất trong source.
+Code chính đều là file JavaScript/PowerShell, mở bằng Notepad hoặc VS Code là
+đọc được. Không có file EXE lạ bị giấu trong source.
 
 ### Tự chạy từng lệnh
 

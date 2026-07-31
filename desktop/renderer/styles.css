@@ -32,12 +32,8 @@ body {
   display: grid;
   place-items: center;
   cursor: grab;
-  -webkit-app-region: no-drag;
+  -webkit-app-region: drag;
   touch-action: none;
-}
-
-#pet.dragging {
-  cursor: grabbing;
 }
 
 #animation {

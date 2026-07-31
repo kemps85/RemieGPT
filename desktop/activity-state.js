@@ -20,8 +20,10 @@ export const PET_STATES = Object.freeze({
     label: "AI đã trả lời"
   },
   hover: {
-    asset: "result.gif",
-    label: "Xin chào"
+    // Hovering is also how the user starts a drag. Keep the same canvas as
+    // idle so Remi does not appear to grow just because the pointer touched it.
+    asset: "idle.gif",
+    label: "Kéo để di chuyển"
   },
   waiting: {
     asset: "waiting-input.gif",
@@ -111,7 +113,7 @@ export class ActivityState {
     this.setAiMode(source, isThinking ? "thinking" : false);
   }
 
-  setAiMode(source, mode) {
+  setAiMode(source, mode, { showResult = true } = {}) {
     this.clearResult();
     if (mode === "thinking" || mode === "writing" || mode === "waiting") {
       this.aiSources.add(source);
@@ -126,21 +128,27 @@ export class ActivityState {
         this.aiWaitingSources.delete(source);
       }
       this.pendingResult = false;
-      if (this.state === "typing") {
-        return;
-      } else {
-        this.clearRelease();
+      this.clearRelease();
+      this.setState(this.currentAiState());
+      return;
+    }
+
+    const wasActive = this.aiSources.has(source);
+    this.aiSources.delete(source);
+    this.aiWritingSources.delete(source);
+    this.aiWaitingSources.delete(source);
+    if (!wasActive) return;
+    if (this.aiSources.size) {
+      if (this.state !== "typing") {
         this.setState(this.currentAiState());
       }
       return;
     }
 
-    this.aiSources.delete(source);
-    this.aiWritingSources.delete(source);
-    this.aiWaitingSources.delete(source);
-    if (this.aiSources.size) {
+    if (!showResult) {
+      this.pendingResult = false;
       if (this.state !== "typing") {
-        this.setState(this.currentAiState());
+        this.setState(this.hovering ? "hover" : "idle");
       }
       return;
     }
@@ -198,8 +206,25 @@ export class ActivityState {
     }
   }
 
-  dispose() {
+  clearAiState() {
+    this.clearAiSources([...this.aiSources]);
+  }
+
+  clearAiSources(sources) {
     this.clearRelease();
     this.clearResult();
+    this.pendingResult = false;
+    for (const source of sources) {
+      this.aiSources.delete(source);
+      this.aiWritingSources.delete(source);
+      this.aiWaitingSources.delete(source);
+    }
+    this.setState(
+      this.aiSources.size ? this.currentAiState() : this.hovering ? "hover" : "idle"
+    );
+  }
+
+  dispose() {
+    this.clearAiState();
   }
 }

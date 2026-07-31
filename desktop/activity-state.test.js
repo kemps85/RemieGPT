@@ -46,13 +46,30 @@ test("hover takes priority over input states", () => {
   assert.deepEqual(emitted, ["hover"]);
 });
 
-test("typing temporarily takes priority, then returns to AI thinking", () => {
+test("an explicit AI event immediately replaces temporary typing", () => {
   const { emitted, state, timers } = harness();
   state.setAiThinking("codex:one", true);
   state.noteKeyboard();
   assert.deepEqual(emitted, ["thinking", "typing"]);
+  state.setAiThinking("codex:one", true);
+  assert.deepEqual(emitted, ["thinking", "typing", "thinking"]);
   timers.at(-1)();
   assert.deepEqual(emitted, ["thinking", "typing", "thinking"]);
+});
+
+test("clearing AI state on a foreground switch does not show a result", () => {
+  const { emitted, state } = harness();
+  state.setAiThinking("codex:one", true);
+  state.clearAiState();
+  assert.deepEqual(emitted, ["thinking", "idle"]);
+});
+
+test("a background source ending after a foreground switch is ignored", () => {
+  const { emitted, state } = harness();
+  state.setAiThinking("web:tab", true);
+  state.clearAiState();
+  state.setAiMode("web:tab", false, { showResult: false });
+  assert.deepEqual(emitted, ["thinking", "idle"]);
 });
 
 test("AI result appears only after every active AI finishes", () => {
